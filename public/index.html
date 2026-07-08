@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercado Virtual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F1E6; --paper-dark:#ECE3D2; --ink:#20281F; --ink-soft:#5B6358;
+  --green:#2F6E4F; --green-deep:#1F4C36; --blue:#2E5A8C; --blue-soft:#D5E2F0;
+  --terracotta:#B5562C; --terracotta-soft:#E7C9B5;
+  --amber:#D99E2B; --amber-soft:#FBF0D4;
+  --wall:#8C8378; --line:#D9CFBA;
+  --white:#FFFDF8; --danger:#A23B2E; --danger-soft:#F8E9E5;
+  --merge:#6B3A8C; --merge-soft:#EAE0F5;
+  --radius:10px;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;margin:0;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+
+/* ── Gate ── */
+.gate{position:fixed;inset:0;background:rgba(32,40,31,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;}
+.gate-card{background:var(--white);border-radius:14px;padding:32px;max-width:420px;width:100%;border:1px solid var(--line);box-shadow:0 18px 48px rgba(32,40,31,.22);}
+.gate-card .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--green-deep);background:var(--terracotta-soft);display:inline-block;padding:3px 8px;border-radius:4px;margin-bottom:10px;}
+.gate-card h2{font-size:22px;margin-bottom:6px;}
+.gate-card p{font-size:13.5px;color:var(--ink-soft);margin:0 0 18px;line-height:1.55;}
+.role-opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:border-color .12s;}
+.role-opt:hover{border-color:var(--ink);}
+.role-opt .ico{font-size:22px;flex:none;}
+.role-opt b{display:block;font-size:14.5px;margin-bottom:2px;}
+.role-opt span{font-size:12.5px;color:var(--ink-soft);}
+.login-form{display:none;}
+.login-form label{display:block;font-size:12.5px;font-weight:500;margin-bottom:4px;color:var(--ink-soft);}
+.login-form input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-size:14px;font-family:'IBM Plex Sans',sans-serif;margin-bottom:10px;}
+.login-form input:focus{outline:2px solid var(--amber);outline-offset:1px;}
+.btn-primary{width:100%;padding:11px;border:none;border-radius:8px;background:var(--green);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:background .1s;}
+.btn-primary:hover{background:var(--green-deep);}
+.btn-primary:disabled{background:#9ab3a4;cursor:default;}
+.err-msg{font-size:12.5px;color:var(--danger);min-height:18px;margin-bottom:8px;}
+.back-link{background:none;border:none;color:var(--ink-soft);font-size:12.5px;cursor:pointer;padding:0;text-decoration:underline;margin-top:6px;}
+.gate-note{font-size:11.5px;color:var(--ink-soft);margin-top:14px;line-height:1.5;border-top:1px dashed var(--line);padding-top:12px;}
+
+/* ── App shell ── */
+.app{max-width:1380px;margin:0 auto;padding:22px 20px 60px;}
+
+header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:18px;flex-wrap:wrap;}
+.top-left .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--green-deep);background:var(--terracotta-soft);display:inline-block;padding:3px 8px;border-radius:4px;margin-bottom:6px;}
+.top-left h1{font-size:22px;font-weight:700;}
+.top-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.tag-role{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 10px;border-radius:20px;background:var(--green);color:#fff;}
+.tag-role.customer{background:var(--blue);}
+.pill{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);border:1px solid var(--line);background:var(--white);border-radius:20px;padding:5px 11px;}
+.pill.ok{color:var(--green-deep);border-color:var(--green);}
+.pill.dirty{color:#7a4a00;border-color:var(--amber);background:var(--amber-soft);}
+
+.ghost-btn{border:1px solid var(--line);background:transparent;color:var(--ink-soft);padding:6px 10px;border-radius:7px;font-size:12.5px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;}
+.ghost-btn:hover{border-color:var(--ink);color:var(--ink);}
+.ghost-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
+
+/* ── Main layout ── */
+.layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+@media(max-width:1020px){.layout{grid-template-columns:1fr;}}
+
+/* ── Library panel (manager) ── */
+#libraryPanel{margin-bottom:16px;display:none;}
+.lib-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.lib-header h3{font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--green-deep);}
+.lib-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;}
+.lib-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--white);font-size:13px;cursor:pointer;transition:border-color .1s;}
+.lib-item:hover{border-color:var(--ink);}
+.lib-item.active-layout{border-color:var(--green);background:#EBF3EE;}
+.lib-item .lib-name{flex:1;font-weight:500;}
+.lib-item .lib-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+.lib-item .pub-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex:none;}
+.lib-actions{display:flex;gap:4px;}
+.lib-actions button{font-size:11.5px;border:none;border-radius:5px;padding:3px 7px;cursor:pointer;background:var(--paper-dark);color:var(--ink-soft);}
+.lib-actions button:hover{background:var(--line);color:var(--ink);}
+.lib-actions .pub-btn{background:#D8EDE2;color:var(--green-deep);}
+.lib-actions .del-btn:hover{background:var(--danger-soft);color:var(--danger);}
+.new-layout-row{display:flex;gap:6px;margin-top:8px;}
+.new-layout-row input{flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:7px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;}
+.new-layout-row .btn-sm{border:none;background:var(--ink);color:var(--paper);border-radius:7px;padding:0 12px;cursor:pointer;font-size:13px;font-weight:500;}
+.no-layouts{font-size:12.5px;color:var(--ink-soft);font-style:italic;}
+
+/* ── Card ── */
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px;}
+.card:last-child{margin-bottom:0;}
+.panel-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--green-deep);font-weight:600;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+
+/* ── Toolbar ── */
+.toolbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+.tool-btn{display:flex;align-items:center;gap:7px;border:1.5px solid var(--ink);background:var(--white);color:var(--ink);padding:7px 11px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;font-family:'IBM Plex Sans',sans-serif;}
+.tool-btn:hover{transform:translateY(-1px);}
+.tool-btn.active{background:var(--ink);color:var(--paper);}
+.tool-btn.merge-active{background:var(--merge);color:#fff;border-color:var(--merge);}
+.swatch{width:12px;height:12px;border-radius:3px;flex:none;border:1px solid rgba(0,0,0,.2);}
+.toolbar .sep{width:1px;height:24px;background:var(--line);margin:0 2px;}
+.size-ctrl{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--ink-soft);}
+.size-ctrl input{width:46px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:center;}
+
+/* ── Grid ── */
+.grid-wrap{overflow:auto;border:1.5px dashed var(--line);border-radius:8px;background:repeating-linear-gradient(0deg,transparent 0 43px,rgba(32,40,31,.04) 43px 44px),repeating-linear-gradient(90deg,transparent 0 43px,rgba(32,40,31,.04) 43px 44px),var(--paper-dark);padding:12px;position:relative;max-height:620px;}
+.grid-stage{position:relative;}
+.grid-canvas{display:grid;user-select:none;}
+.cell{width:44px;height:44px;border:1px solid rgba(32,40,31,.08);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;font-size:16px;background:transparent;}
+.cell.empty:hover{background:rgba(47,110,79,.08);}
+.cell.wall{background:repeating-linear-gradient(45deg,var(--wall) 0 5px,#7a7268 5px 10px);}
+.cell.entrance{background:var(--green);color:#fff;}
+.cell.checkout{background:var(--blue);color:#fff;}
+.cell.shelf{background:var(--terracotta);color:#fff;}
+.cell.shelf.sel1{outline:3px solid var(--amber);outline-offset:-3px;z-index:2;}
+.cell.shelf.sel-multi{outline:3px solid var(--merge);outline-offset:-3px;z-index:2;}
+.cell.shelf.has-route{box-shadow:inset 0 0 0 3px var(--amber);}
+.badge-count{position:absolute;bottom:1px;right:2px;font-family:'IBM Plex Mono',monospace;font-size:9px;background:rgba(0,0,0,.28);border-radius:3px;padding:0 3px;}
+svg.route-overlay{position:absolute;top:0;left:0;pointer-events:none;}
+
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--ink-soft);}
+.legend span{display:inline-flex;align-items:center;gap:5px;}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;}
+.meta-line{font-size:11.5px;color:var(--ink-soft);margin-top:8px;font-family:'IBM Plex Mono',monospace;}
+
+/* ── Save bar (manager) ── */
+#saveBar{display:none;align-items:center;gap:10px;margin-bottom:14px;background:var(--amber-soft);border:1px solid #D99E2B44;border-radius:8px;padding:9px 12px;font-size:13px;}
+.save-bar-actions{display:flex;gap:6px;margin-left:auto;}
+.btn-save{border:none;background:var(--green);color:#fff;padding:6px 14px;border-radius:7px;cursor:pointer;font-weight:600;font-size:12.5px;}
+.btn-save-as{border:1px solid var(--line);background:var(--white);color:var(--ink);padding:6px 12px;border-radius:7px;cursor:pointer;font-size:12.5px;}
+
+/* ── Shelf / merge panel ── */
+.selected-info{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);margin-bottom:8px;}
+.tag-input-row{display:flex;gap:6px;margin-bottom:8px;}
+.tag-input-row input{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:13.5px;font-family:'IBM Plex Sans',sans-serif;}
+.tag-input-row input:focus{outline:2px solid var(--amber);outline-offset:1px;}
+.tag-input-row button{border:none;background:var(--ink);color:var(--paper);border-radius:7px;padding:0 12px;cursor:pointer;font-size:13px;font-weight:500;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.tag{display:flex;align-items:center;gap:5px;border-radius:20px;padding:4px 6px 4px 10px;font-size:12.5px;}
+.tag.shelf-tag{background:var(--terracotta-soft);color:var(--green-deep);}
+.tag.partial-tag{background:#F0E8C8;color:#6E5208;}
+.tag.merge-common{background:var(--merge-soft);color:var(--merge);}
+.tag.shop-tag{background:#E3EBE2;color:var(--green-deep);}
+.tag.readonly button,.tag button{border:none;background:transparent;cursor:pointer;color:inherit;font-size:13px;line-height:1;padding:2px 4px;opacity:.6;}
+.tag button:hover{opacity:1;}
+.tag.readonly button{display:none;}
+.empty-hint{font-size:12.5px;color:var(--ink-soft);font-style:italic;}
+.merge-section-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin:10px 0 5px;}
+.merge-eq-btn{width:100%;padding:9px;border:1.5px dashed var(--merge);background:var(--merge-soft);color:var(--merge);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;}
+.merge-eq-btn:hover{background:#DDD0EE;}
+.clear-sel-btn{font-size:12px;color:var(--ink-soft);border:none;background:none;cursor:pointer;text-decoration:underline;padding:0;margin-top:6px;display:block;}
+
+/* ── Shopping list & route ── */
+.route-action{width:100%;padding:10px;border:none;border-radius:8px;background:var(--green);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Space Grotesk',sans-serif;}
+.route-action:hover{background:var(--green-deep);}
+.route-list{list-style:none;margin:0;padding:0;counter-reset:stop;}
+.route-list li{counter-increment:stop;display:flex;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+.route-list li:last-child{border-bottom:none;}
+.route-list li::before{content:counter(stop);flex:none;width:22px;height:22px;border-radius:50%;background:var(--amber);color:#3a2a06;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;display:flex;align-items:center;justify-content:center;}
+.route-list .coord{color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:11px;}
+.missing-box{background:var(--danger-soft);border:1px solid #E3B6A8;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--danger);margin-top:8px;}
+.missing-box b{display:block;margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
+.warn-box{background:#FBF1DC;border:1px solid #E8CE8A;border-radius:8px;padding:10px 12px;font-size:13px;color:#6E5208;margin-bottom:8px;}
+.route-stats{font-size:11.5px;color:var(--ink-soft);margin-top:8px;font-family:'IBM Plex Mono',monospace;}
+.lock-msg{font-size:13px;color:var(--ink-soft);background:var(--paper-dark);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+
+/* ── Settings card (manager) ── */
+.setting-row{display:flex;gap:6px;margin-bottom:6px;}
+.setting-row input{flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:7px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;}
+.setting-row button{border:none;background:var(--ink);color:var(--paper);border-radius:7px;padding:0 12px;cursor:pointer;font-size:13px;font-weight:500;}
+.small-note{font-size:11.5px;color:var(--ink-soft);margin-top:4px;line-height:1.45;}
+.info-tag{font-size:11.5px;color:var(--green-deep);background:#D8EDE2;border-radius:4px;padding:2px 6px;}
+datalist{display:none;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .5s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<!-- ─── GATE ─────────────────────────────────────────────────────────────── -->
+<div class="gate" id="loginGate">
+  <div class="gate-card">
+    <span class="eyebrow">Mercado Virtual</span>
+    <h2>Bem-vindo(a)</h2>
+    <p>Clientes veem o mapa e planejam a rota. Gerentes editam a planta da loja.</p>
+
+    <button class="role-opt" id="guestBtn">
+      <span class="ico">🛒</span>
+      <span><b>Entrar como cliente</b><span>Visualizar mapa e calcular rota de compras</span></span>
+    </button>
+
+    <button class="role-opt" id="managerBtn">
+      <span class="ico">🗝️</span>
+      <span><b>Entrar como gerente</b><span>Editar planta, prateleiras e produtos</span></span>
+    </button>
+
+    <div class="login-form" id="loginForm">
+      <label>Usuário</label>
+      <input type="text" id="loginUser" autocomplete="username" placeholder="gerente">
+      <label>Senha</label>
+      <input type="password" id="loginPass" autocomplete="current-password" placeholder="••••">
+      <div class="err-msg" id="loginErr"></div>
+      <button class="btn-primary" id="loginSubmitBtn">Entrar <span id="loginSpinner" style="display:none;" class="spinner"></span></button>
+      <br><button class="back-link" id="loginBack">← voltar</button>
+    </div>
+
+    <div class="gate-note">
+      O acesso de gerente exige credenciais verificadas no servidor. Clientes não precisam de conta — apenas visualizam o mapa publicado.
+    </div>
+  </div>
+</div>
+
+<!-- ─── APP ──────────────────────────────────────────────────────────────── -->
+<div class="app" id="appRoot" style="display:none;">
+
+  <header class="top">
+    <div class="top-left">
+      <div class="eyebrow">Planta &middot; Rota de compras</div>
+      <h1 id="headerTitle">Mercado Virtual</h1>
+    </div>
+    <div class="top-right">
+      <span class="pill" id="statusPill">—</span>
+      <span class="tag-role" id="roleBadge">—</span>
+      <button class="ghost-btn" id="switchBtn">Trocar perfil</button>
+    </div>
+  </header>
+
+  <div id="saveBar">
+    <span>⚠️ Alterações não salvas</span>
+    <span id="currentLayoutName" style="font-weight:500;"></span>
+    <div class="save-bar-actions">
+      <button class="btn-save-as" id="saveAsBtn">Salvar como…</button>
+      <button class="btn-save" id="saveCurBtn">Salvar</button>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- LEFT -->
+    <div>
+      <!-- Library (manager only) -->
+      <div id="libraryPanel" class="card">
+        <div class="lib-header">
+          <h3>📂 Layouts salvos</h3>
+          <button class="ghost-btn" id="refreshLibBtn">↻ Atualizar</button>
+        </div>
+        <div class="lib-list" id="libList"><span class="no-layouts">Nenhum layout salvo.</span></div>
+        <div class="new-layout-row" style="margin-top:10px;">
+          <input type="text" id="newLayoutName" placeholder="Nome do novo layout…">
+          <button class="btn-sm" id="newLayoutBtn">Novo</button>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="card">
+        <div class="lock-msg" id="lockMsg" style="display:none;">🔒 Modo cliente — visualização somente. Clique numa prateleira para ver os produtos.</div>
+        <div class="toolbar" id="editToolbar" style="display:none;">
+          <button class="tool-btn active" data-tool="select"><span class="swatch" style="background:#fff;border-style:dashed;"></span>Selecionar</button>
+          <button class="tool-btn" data-tool="entrance"><span class="swatch" style="background:var(--green)"></span>Entrada</button>
+          <button class="tool-btn" data-tool="checkout"><span class="swatch" style="background:var(--blue)"></span>Caixa</button>
+          <button class="tool-btn" data-tool="shelf"><span class="swatch" style="background:var(--terracotta)"></span>Prateleira</button>
+          <button class="tool-btn" data-tool="wall"><span class="swatch" style="background:var(--wall)"></span>Parede</button>
+          <button class="tool-btn" data-tool="empty"><span class="swatch" style="background:#fff;border:1px solid #ccc;"></span>Apagar</button>
+          <div class="sep"></div>
+          <button class="tool-btn" id="mergeModeBtn"><span class="swatch" style="background:var(--merge)"></span>🔀 Mesclar</button>
+          <div class="sep"></div>
+          <div class="size-ctrl">
+            Linhas <input id="rowsInput" type="number" min="4" max="20" value="9">
+            Colunas <input id="colsInput" type="number" min="4" max="24" value="12">
+            <button class="ghost-btn" id="resizeBtn">Redimensionar</button>
+          </div>
+          <div class="sep"></div>
+          <button class="ghost-btn danger" id="clearBtn">Limpar</button>
+        </div>
+        <div class="grid-wrap">
+          <div class="grid-stage" id="gridStage">
+            <div class="grid-canvas" id="gridCanvas"></div>
+            <svg class="route-overlay" id="routeOverlay"></svg>
+          </div>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--green)"></i>Entrada</span>
+          <span><i style="background:var(--blue)"></i>Caixa</span>
+          <span><i style="background:var(--terracotta)"></i>Prateleira</span>
+          <span><i style="background:var(--wall)"></i>Parede</span>
+          <span><i style="background:var(--amber)"></i>Rota</span>
+          <span><i style="background:var(--merge);opacity:.7"></i>Mescla</span>
+        </div>
+        <div class="meta-line" id="gridHint" style="display:none;">
+          Clique/arraste para pintar. Ative <b>🔀 Mesclar</b> e clique nas prateleiras para selecioná-las.
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+
+      <!-- Shelf / merge panel -->
+      <div class="card" id="shelfCard">
+        <div class="panel-title">
+          <span id="shelfPanelTitle">Prateleira</span>
+          <button class="ghost-btn" id="clearSelBtn" style="display:none;font-size:11.5px;">✕ Limpar seleção</button>
+        </div>
+        <div id="singleShelfEditor">
+          <div class="selected-info" id="selectedInfo">Nenhuma prateleira selecionada.</div>
+          <div id="shelfEditorInner" style="display:none;">
+            <div class="tag-input-row" id="productInputRow" style="display:none;">
+              <input id="productInput" type="text" placeholder="nome do produto…">
+              <button id="addProductBtn">+</button>
+            </div>
+            <div class="tags" id="productTags"></div>
+          </div>
+        </div>
+        <div id="mergePanel" style="display:none;">
+          <div class="selected-info" id="mergeInfo"></div>
+          <div class="tag-input-row">
+            <input id="mergeInput" type="text" placeholder="produto para todas as prateleiras…">
+            <button id="addMergeBtn">+</button>
+          </div>
+          <div class="merge-section-label">Produtos em <b>todas</b> selecionadas</div>
+          <div class="tags" id="commonTags"></div>
+          <div class="merge-section-label" id="partialLabel" style="display:none;">Produtos em <b>parte</b> das selecionadas</div>
+          <div class="tags" id="partialTags"></div>
+          <button class="merge-eq-btn" id="equalizeBtn">⊕ Equalizar — aplicar união a todas</button>
+          <button class="clear-sel-btn" id="clearSelBtn2">Limpar seleção</button>
+        </div>
+      </div>
+
+      <!-- Shopping list -->
+      <div class="card">
+        <div class="panel-title">Lista de compras</div>
+        <div class="tag-input-row">
+          <input id="shopInput" type="text" placeholder="adicione um item…" list="knownProducts">
+          <button id="addShopBtn">+</button>
+        </div>
+        <datalist id="knownProducts"></datalist>
+        <div class="tags" id="shopTags"></div>
+        <div class="empty-hint" id="shopHint" style="margin-top:6px;">Lista vazia — adicione itens para calcular a rota.</div>
+        <button class="route-action" id="findRouteBtn" style="margin-top:12px;">Calcular melhor rota →</button>
+      </div>
+
+      <!-- Route result -->
+      <div class="card" id="routeCard" style="display:none;">
+        <div class="panel-title">Rota sugerida</div>
+        <div id="routeWarning"></div>
+        <ol class="route-list" id="routeList"></ol>
+        <div id="missingBox"></div>
+        <div class="route-stats" id="routeStats"></div>
+      </div>
+
+      <!-- Manager settings -->
+      <div class="card" id="settingsCard" style="display:none;">
+        <div class="panel-title">Configurações do gerente</div>
+        <div style="margin-bottom:10px;">
+          <div class="small-note" style="margin-bottom:6px;font-weight:500;">Alterar senha</div>
+          <div class="setting-row">
+            <input type="password" id="curPassInput" placeholder="senha atual">
+          </div>
+          <div class="setting-row">
+            <input type="password" id="newPassInput" placeholder="nova senha">
+            <button id="changePassBtn">Salvar</button>
+          </div>
+          <div class="err-msg" id="passErr"></div>
+        </div>
+        <div>
+          <div class="small-note" style="margin-bottom:6px;font-weight:500;">Criar outro gerente</div>
+          <div class="setting-row">
+            <input type="text" id="newMgrUser" placeholder="usuário">
+            <input type="password" id="newMgrPass" placeholder="senha">
+            <button id="createMgrBtn">Criar</button>
+          </div>
+          <div class="err-msg" id="mgrErr"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+// ─── State ────────────────────────────────────────────────────────────────────
+let authToken = null, userRole = null, username = null;
+let rows = 9, cols = 12;
+let grid = [], shelfProducts = {};
+let currentTool = 'select';
+let primarySel = null;       // "r,c" - single selected shelf
+let multiSel = new Set();    // Set of "r,c" - multi-select for merge
+let mergeMode = false;       // when true, shelf clicks toggle multi-selection
+let shoppingList = [];
+let isPainting = false;
+let currentLayoutId = null, currentLayoutName = null;
+let isDirty = false;
+const CELL = 44;
+const API = '';  // same origin
+
+// ─── API helper ───────────────────────────────────────────────────────────────
+async function api(method, path, body){
+  const h = {'Content-Type':'application/json'};
+  if(authToken) h['Authorization'] = 'Bearer ' + authToken;
+  const r = await fetch(API + '/api' + path, {method, headers:h, body: body ? JSON.stringify(body) : undefined});
+  const data = await r.json();
+  if(!r.ok) throw new Error(data.error || 'Erro de servidor');
+  return data;
+}
+
+// ─── Auth / gate ──────────────────────────────────────────────────────────────
+function showGate(){
+  document.getElementById('loginGate').style.display='flex';
+  document.getElementById('appRoot').style.display='none';
+  document.getElementById('loginForm').style.display='none';
+  document.getElementById('loginErr').textContent='';
+}
+
+function hideGate(){
+  document.getElementById('loginGate').style.display='none';
+  document.getElementById('appRoot').style.display='';
+}
+
+document.getElementById('guestBtn').onclick = async () => {
+  authToken=null; userRole='customer'; username='Cliente';
+  await enterApp();
+};
+
+document.getElementById('managerBtn').onclick = () => {
+  document.getElementById('loginForm').style.display='block';
+  document.getElementById('loginUser').focus();
+};
+
+document.getElementById('loginBack').onclick = () => {
+  document.getElementById('loginForm').style.display='none';
+};
+
+async function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if(!u||!p){document.getElementById('loginErr').textContent='Preencha usuário e senha.';return;}
+  const btn = document.getElementById('loginSubmitBtn');
+  btn.disabled=true; document.getElementById('loginSpinner').style.display='inline-block';
+  try{
+    const res = await api('POST','/auth/login',{username:u,password:p});
+    authToken=res.token; userRole=res.role; username=res.username;
+    await enterApp();
+  }catch(e){
+    document.getElementById('loginErr').textContent=e.message;
+  }finally{
+    btn.disabled=false; document.getElementById('loginSpinner').style.display='none';
+  }
+}
+document.getElementById('loginSubmitBtn').onclick=doLogin;
+document.getElementById('loginPass').onkeydown=e=>{if(e.key==='Enter')doLogin();};
+
+document.getElementById('switchBtn').onclick=()=>{
+  authToken=null; userRole=null; username=null; currentLayoutId=null; isDirty=false;
+  showGate();
+};
+
+// ─── Enter app ────────────────────────────────────────────────────────────────
+async function enterApp(){
+  hideGate();
+  applyRoleUI();
+  if(userRole==='manager'){
+    await loadLibrary();
+    // load most recent active or first layout
+    const lib = await api('GET','/layouts');
+    const active = lib.find(l=>l.is_active) || lib[0];
+    if(active) await loadLayout(active.id);
+    else { defaultDemo(); renderAll(); }
+  } else {
+    // customer: load active layout from server
+    try{
+      const layout = await api('GET','/layouts/active');
+      if(layout && layout.data){
+        applyLayoutData(layout.data);
+        currentLayoutId=layout.id; currentLayoutName=layout.name;
+        setStatus('Planta publicada: '+layout.name, true);
+      } else {
+        defaultDemo();
+        setStatus('Nenhuma planta publicada ainda', false);
+      }
+    }catch{
+      defaultDemo();
+      setStatus('Não foi possível carregar a planta', false);
+    }
+    renderAll();
+  }
+}
+
+function applyRoleUI(){
+  const isMgr = userRole==='manager';
+  document.getElementById('roleBadge').textContent = isMgr ? username+' (Gerente)' : 'Cliente';
+  document.getElementById('roleBadge').className = 'tag-role' + (isMgr ? '' : ' customer');
+  document.getElementById('editToolbar').style.display = isMgr ? 'flex' : 'none';
+  document.getElementById('lockMsg').style.display = isMgr ? 'none' : 'block';
+  document.getElementById('gridHint').style.display = isMgr ? 'block' : 'none';
+  document.getElementById('libraryPanel').style.display = isMgr ? 'block' : 'none';
+  document.getElementById('settingsCard').style.display = isMgr ? 'block' : 'none';
+  document.getElementById('productInputRow').style.display = isMgr ? 'flex' : 'none';
+  if(isMgr) document.getElementById('headerTitle').textContent='Mercado Virtual — Painel do Gerente';
+  else document.getElementById('headerTitle').textContent='Mercado Virtual';
+}
+
+// ─── Grid state ───────────────────────────────────────────────────────────────
+function defaultDemo(){
+  rows=9; cols=12;
+  grid=emptyGrid(rows,cols); shelfProducts={};
+  grid[0][0]='entrance'; grid[rows-1][cols-1]='checkout';
+  const shelves=[
+    {r:1,c:2,items:['arroz','feijão','macarrão','farinha']},
+    {r:1,c:5,items:['açúcar','sal','óleo','vinagre']},
+    {r:1,c:8,items:['biscoito','salgadinho','granola']},
+    {r:4,c:2,items:['leite','iogurte','queijo','manteiga']},
+    {r:4,c:5,items:['frango','carne moída','linguiça']},
+    {r:4,c:8,items:['detergente','sabão em pó','amaciante']},
+    {r:6,c:3,items:['maçã','banana','tomate','cebola','alho']},
+    {r:6,c:8,items:['refrigerante','suco','água','cerveja']},
+  ];
+  shelves.forEach(s=>{
+    grid[s.r][s.c]='shelf';
+    shelfProducts[s.r+','+s.c]=s.items.slice();
+  });
+  currentLayoutId=null; currentLayoutName=null; isDirty=false;
+}
+
+function emptyGrid(r,c){return Array.from({length:r},()=>Array(c).fill('empty'));}
+function cellKey(r,c){return r+','+c;}
+
+function applyLayoutData(data){
+  rows=data.rows; cols=data.cols; grid=data.grid; shelfProducts=data.shelfProducts||{};
+  primarySel=null; multiSel=new Set(); isDirty=false;
+  document.getElementById('rowsInput').value=rows;
+  document.getElementById('colsInput').value=cols;
+}
+
+function currentData(){return{rows,cols,grid,shelfProducts};}
+
+// ─── Dirty tracking ───────────────────────────────────────────────────────────
+function markDirty(){
+  isDirty=true;
+  const bar=document.getElementById('saveBar');
+  bar.style.display='flex';
+  document.getElementById('currentLayoutName').textContent=currentLayoutName||'(sem título)';
+}
+
+function markClean(){
+  isDirty=false;
+  document.getElementById('saveBar').style.display='none';
+}
+
+// ─── Library ──────────────────────────────────────────────────────────────────
+async function loadLibrary(){
+  if(userRole!=='manager') return;
+  let layouts=[];
+  try{ layouts = await api('GET','/layouts'); }catch{ return; }
+  const el = document.getElementById('libList');
+  if(!layouts.length){el.innerHTML='<span class="no-layouts">Nenhum layout salvo.</span>';return;}
+  el.innerHTML='';
+  layouts.forEach(l=>{
+    const row=document.createElement('div');
+    row.className='lib-item'+(l.id===currentLayoutId?' active-layout':'');
+    row.innerHTML=`
+      ${l.is_active?'<span class="pub-dot" title="Publicado"></span>':'<span style="width:8px;flex:none;"></span>'}
+      <span class="lib-name">${esc(l.name)}</span>
+      <span class="lib-date">${l.updated_at?.slice(0,16)||''}</span>
+      <div class="lib-actions">
+        <button class="pub-btn" title="${l.is_active?'Despublicar':'Publicar'}">${l.is_active?'Pub.✓':'Publicar'}</button>
+        <button class="del-btn" title="Excluir">🗑</button>
+      </div>`;
+    row.querySelector('.lib-name').onclick=()=>loadLayout(l.id);
+    row.querySelector('.pub-btn').onclick=async(e)=>{
+      e.stopPropagation();
+      try{
+        if(l.is_active) await api('POST',`/layouts/${l.id}/unpublish`);
+        else await api('POST',`/layouts/${l.id}/publish`);
+        await loadLibrary();
+      }catch(err){alert(err.message);}
+    };
+    row.querySelector('.del-btn').onclick=async(e)=>{
+      e.stopPropagation();
+      if(!confirm(`Excluir "${l.name}"?`)) return;
+      try{await api('DELETE',`/layouts/${l.id}`); await loadLibrary();}
+      catch(err){alert(err.message);}
+    };
+    el.appendChild(row);
+  });
+}
+
+async function loadLayout(id){
+  try{
+    const layout = await api('GET',`/layouts/${id}`);
+    applyLayoutData(layout.data);
+    currentLayoutId=layout.id; currentLayoutName=layout.name;
+    document.getElementById('headerTitle').textContent='Painel do Gerente — '+layout.name;
+    setStatus('Layout carregado: '+layout.name, true);
+    renderAll();
+    await loadLibrary();
+  }catch(e){alert('Erro ao carregar: '+e.message);}
+}
+
+async function saveCurrentLayout(newName, publish){
+  const name = newName || currentLayoutName;
+  if(!name){alert('Dê um nome ao layout antes de salvar.');return;}
+  const data = currentData();
+  try{
+    if(currentLayoutId && !newName){
+      await api('PUT',`/layouts/${currentLayoutId}`,{data, publish: publish||false});
+    } else {
+      const res = await api('POST','/layouts',{name, data, publish: publish||false});
+      currentLayoutId=res.id; currentLayoutName=name;
+      document.getElementById('headerTitle').textContent='Painel do Gerente — '+name;
+    }
+    markClean();
+    setStatus('Salvo: '+name, true);
+    await loadLibrary();
+  }catch(e){alert('Erro ao salvar: '+e.message);}
+}
+
+document.getElementById('saveCurBtn').onclick=()=>saveCurrentLayout();
+document.getElementById('saveAsBtn').onclick=()=>{
+  const n=prompt('Nome para o novo layout:',currentLayoutName||'');
+  if(n) saveCurrentLayout(n);
+};
+document.getElementById('newLayoutBtn').onclick=()=>{
+  const n=document.getElementById('newLayoutName').value.trim();
+  if(!n){alert('Digite um nome para o novo layout.');return;}
+  if(!confirm('Criar novo layout vazio "'+n+'"?')) return;
+  defaultDemo(); renderAll(); markDirty();
+  currentLayoutName=n; document.getElementById('currentLayoutName').textContent=n;
+  document.getElementById('newLayoutName').value='';
+};
+document.getElementById('refreshLibBtn').onclick=loadLibrary;
+
+// ─── Grid rendering ───────────────────────────────────────────────────────────
+function renderAll(){
+  renderGrid();
+  renderShelfPanel();
+  refreshKnownProducts();
+  renderShopTags();
+  document.getElementById('rowsInput').value=rows;
+  document.getElementById('colsInput').value=cols;
+}
+
+function renderGrid(){
+  const canvas=document.getElementById('gridCanvas');
+  canvas.style.gridTemplateColumns=`repeat(${cols},${CELL}px)`;
+  canvas.style.gridTemplateRows=`repeat(${rows},${CELL}px)`;
+  canvas.innerHTML='';
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const type=grid[r][c];
+      const div=document.createElement('div');
+      const key=cellKey(r,c);
+      div.className='cell '+type;
+      div.dataset.r=r; div.dataset.c=c;
+      if(type==='entrance') div.textContent='➜';
+      if(type==='checkout') div.textContent='✓';
+      if(type==='shelf'){
+        if(key===primarySel) div.classList.add('sel1');
+        if(multiSel.has(key)) div.classList.add('sel-multi');
+        const n=(shelfProducts[key]||[]).length;
+        if(n>0){
+          const b=document.createElement('span');
+          b.className='badge-count';b.textContent=n;div.appendChild(b);
+        }
+      }
+      div.addEventListener('mousedown',e=>{isPainting=true;handleCell(r,c,e);});
+      div.addEventListener('mouseenter',e=>{if(isPainting)handleCell(r,c,e);});
+      canvas.appendChild(div);
+    }
+  }
+  const stage=document.getElementById('gridStage');
+  stage.style.width=(cols*CELL)+'px'; stage.style.height=(rows*CELL)+'px';
+  const svg=document.getElementById('routeOverlay');
+  svg.setAttribute('width',cols*CELL); svg.setAttribute('height',rows*CELL);
+  svg.setAttribute('viewBox',`0 0 ${cols*CELL} ${rows*CELL}`);
+}
+
+document.addEventListener('mouseup',()=>{isPainting=false;});
+
+function handleCell(r,c,e){
+  const key=cellKey(r,c);
+
+  if(mergeMode && userRole==='manager'){
+    if(grid[r][c]==='shelf'){
+      if(multiSel.has(key)) multiSel.delete(key);
+      else multiSel.add(key);
+      primarySel = multiSel.size===0 ? null : (primarySel||key);
+      renderGrid(); renderShelfPanel(); clearRouteVisual();
+    }
+    return;
+  }
+
+  if(userRole!=='manager' || currentTool==='select'){
+    if(grid[r][c]==='shelf'){
+      primarySel=key; multiSel=new Set();
+      renderGrid(); renderShelfPanel(); clearRouteVisual();
+    }
+    return;
+  }
+  if(currentTool!=='select'){
+    grid[r][c]=currentTool;
+    if(currentTool!=='shelf' && shelfProducts[key]) delete shelfProducts[key];
+    if(currentTool==='shelf' && !shelfProducts[key]) shelfProducts[key]=[];
+    if(currentTool!=='shelf'){if(primarySel===key){primarySel=null;} multiSel.delete(key);}
+    renderGrid(); renderShelfPanel(); clearRouteVisual(); markDirty();
+  }
+}
+
+// ─── Shelf panel ──────────────────────────────────────────────────────────────
+function renderShelfPanel(){
+  const isMulti = multiSel.size >= 2;
+  document.getElementById('singleShelfEditor').style.display = isMulti ? 'none' : 'block';
+  document.getElementById('mergePanel').style.display = isMulti ? 'block' : 'none';
+  document.getElementById('shelfPanelTitle').textContent = isMulti
+    ? `🔀 Mesclar prateleiras (${multiSel.size})`
+    : 'Prateleira';
+  document.getElementById('clearSelBtn').style.display = (primarySel||multiSel.size>0) ? 'inline-block' : 'none';
+
+  if(isMulti) renderMergePanel();
+  else renderSingleShelf();
+}
+
+function renderSingleShelf(){
+  const info=document.getElementById('selectedInfo');
+  const inner=document.getElementById('shelfEditorInner');
+  if(!primarySel){ info.textContent='Nenhuma prateleira selecionada.'; inner.style.display='none'; return; }
+  const [r,c]=primarySel.split(',').map(Number);
+  info.innerHTML=`Prateleira <span class="mono">[${r}, ${c}]</span>`;
+  inner.style.display='block';
+  document.getElementById('productInputRow').style.display = userRole==='manager' ? 'flex' : 'none';
+  const tagsEl=document.getElementById('productTags');
+  tagsEl.innerHTML='';
+  const prods=shelfProducts[primarySel]||[];
+  if(prods.length===0){tagsEl.innerHTML='<span class="empty-hint">Nenhum produto cadastrado.</span>';return;}
+  prods.forEach((p,i)=>{
+    const t=document.createElement('span');
+    t.className='tag shelf-tag'+(userRole!=='manager'?' readonly':'');
+    t.innerHTML=`${esc(p)}${userRole==='manager'?` <button data-i="${i}">×</button>`:''}`;
+    if(userRole==='manager') t.querySelector('button').onclick=()=>{
+      shelfProducts[primarySel].splice(i,1);
+      renderShelfPanel(); renderGrid(); refreshKnownProducts(); markDirty();
+    };
+    tagsEl.appendChild(t);
+  });
+}
+
+function renderMergePanel(){
+  const keys=[...multiSel];
+  document.getElementById('mergeInfo').textContent=keys.length+' prateleiras selecionadas';
+  const sets=keys.map(k=>new Set(shelfProducts[k]||[]));
+  const union=new Set(sets.flatMap(s=>[...s]));
+  const common=[...union].filter(p=>sets.every(s=>s.has(p)));
+  const partial=[...union].filter(p=>!sets.every(s=>s.has(p)));
+
+  // Common
+  const commonEl=document.getElementById('commonTags');
+  commonEl.innerHTML='';
+  if(common.length===0) commonEl.innerHTML='<span class="empty-hint">Nenhum produto em comum.</span>';
+  common.forEach(p=>{
+    const t=document.createElement('span');t.className='tag merge-common';
+    t.innerHTML=`${esc(p)} <button>×</button>`;
+    t.querySelector('button').onclick=()=>{
+      keys.forEach(k=>{
+        const idx=(shelfProducts[k]||[]).indexOf(p);
+        if(idx>=0) shelfProducts[k].splice(idx,1);
+      });
+      renderMergePanel(); renderGrid(); refreshKnownProducts(); markDirty();
+    };
+    commonEl.appendChild(t);
+  });
+
+  // Partial
+  const partialLabel=document.getElementById('partialLabel');
+  const partialEl=document.getElementById('partialTags');
+  partialLabel.style.display=partial.length?'block':'none';
+  partialEl.innerHTML='';
+  partial.forEach(p=>{
+    const t=document.createElement('span');t.className='tag partial-tag';
+    t.innerHTML=`${esc(p)} <button title="Adicionar a todas">→todas</button>`;
+    t.querySelector('button').onclick=()=>{
+      keys.forEach(k=>{
+        if(!shelfProducts[k]) shelfProducts[k]=[];
+        if(!shelfProducts[k].includes(p)) shelfProducts[k].push(p);
+      });
+      renderMergePanel(); renderGrid(); refreshKnownProducts(); markDirty();
+    };
+    partialEl.appendChild(t);
+  });
+}
+
+function addMergeProduct(){
+  const val=document.getElementById('mergeInput').value.trim();
+  if(!val||multiSel.size<2) return;
+  [...multiSel].forEach(k=>{
+    if(!shelfProducts[k]) shelfProducts[k]=[];
+    if(!shelfProducts[k].includes(val)) shelfProducts[k].push(val);
+  });
+  document.getElementById('mergeInput').value='';
+  renderMergePanel(); renderGrid(); refreshKnownProducts(); markDirty();
+}
+document.getElementById('addMergeBtn').onclick=addMergeProduct;
+document.getElementById('mergeInput').onkeydown=e=>{if(e.key==='Enter')addMergeProduct();};
+
+document.getElementById('equalizeBtn').onclick=()=>{
+  const keys=[...multiSel];
+  const union=new Set(keys.flatMap(k=>shelfProducts[k]||[]));
+  const arr=[...union];
+  keys.forEach(k=>shelfProducts[k]=arr.slice());
+  renderMergePanel(); renderGrid(); refreshKnownProducts(); markDirty();
+};
+
+function clearSelection(){primarySel=null;multiSel=new Set();renderGrid();renderShelfPanel();}
+document.getElementById('clearSelBtn').onclick=clearSelection;
+document.getElementById('clearSelBtn2').onclick=clearSelection;
+
+function addProductToShelf(){
+  const val=document.getElementById('productInput').value.trim();
+  if(!val||!primarySel) return;
+  if(!shelfProducts[primarySel]) shelfProducts[primarySel]=[];
+  shelfProducts[primarySel].push(val);
+  document.getElementById('productInput').value='';
+  renderShelfPanel(); renderGrid(); refreshKnownProducts(); markDirty();
+}
+document.getElementById('addProductBtn').onclick=addProductToShelf;
+document.getElementById('productInput').onkeydown=e=>{if(e.key==='Enter')addProductToShelf();};
+
+function refreshKnownProducts(){
+  const list=document.getElementById('knownProducts');
+  const all=new Set(Object.values(shelfProducts).flat());
+  list.innerHTML=[...all].sort().map(p=>`<option value="${esc(p)}">`).join('');
+}
+
+// ─── Toolbar ──────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tool-btn[data-tool]').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tool-btn[data-tool]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTool=btn.dataset.tool;
+    // desativa modo mesclar ao trocar ferramenta
+    if(mergeMode){ mergeMode=false; document.getElementById('mergeModeBtn').classList.remove('merge-active'); clearSelection(); }
+    if(currentTool!=='select'){clearSelection();}
+  };
+});
+
+document.getElementById('mergeModeBtn').onclick=()=>{
+  mergeMode=!mergeMode;
+  document.getElementById('mergeModeBtn').classList.toggle('merge-active', mergeMode);
+  if(mergeMode){
+    // força ferramenta "selecionar" enquanto mescla
+    document.querySelectorAll('.tool-btn[data-tool]').forEach(b=>b.classList.remove('active'));
+    document.querySelector('.tool-btn[data-tool="select"]').classList.add('active');
+    currentTool='select';
+  } else {
+    clearSelection();
+  }
+};
+document.getElementById('resizeBtn').onclick=()=>{
+  const r=Math.max(4,Math.min(20,parseInt(document.getElementById('rowsInput').value)||9));
+  const c=Math.max(4,Math.min(24,parseInt(document.getElementById('colsInput').value)||12));
+  if(!confirm('Redimensionar limpa o layout atual. Continuar?')) return;
+  rows=r; cols=c; grid=emptyGrid(rows,cols); shelfProducts={}; primarySel=null; multiSel=new Set();
+  renderAll(); clearRouteVisual(); markDirty();
+};
+document.getElementById('clearBtn').onclick=()=>{
+  if(!confirm('Limpar toda a planta?')) return;
+  grid=emptyGrid(rows,cols); shelfProducts={}; primarySel=null; multiSel=new Set();
+  renderAll(); clearRouteVisual(); markDirty();
+};
+
+// ─── Shopping list ────────────────────────────────────────────────────────────
+function renderShopTags(){
+  const el=document.getElementById('shopTags');
+  el.innerHTML='';
+  document.getElementById('shopHint').style.display=shoppingList.length?'none':'block';
+  shoppingList.forEach((item,i)=>{
+    const t=document.createElement('span');t.className='tag shop-tag';
+    t.innerHTML=`${esc(item)} <button>×</button>`;
+    t.querySelector('button').onclick=()=>{shoppingList.splice(i,1);renderShopTags();};
+    el.appendChild(t);
+  });
+}
+function addShopItem(){
+  const v=document.getElementById('shopInput').value.trim();
+  if(!v) return;
+  shoppingList.push(v); document.getElementById('shopInput').value=''; renderShopTags();
+}
+document.getElementById('addShopBtn').onclick=addShopItem;
+document.getElementById('shopInput').onkeydown=e=>{if(e.key==='Enter')addShopItem();};
+
+// ─── Pathfinding ──────────────────────────────────────────────────────────────
+function isWalkable(r,c){
+  if(r<0||c<0||r>=rows||c>=cols) return false;
+  const t=grid[r][c];
+  return t==='empty'||t==='entrance'||t==='checkout';
+}
+function bfsFrom(sr,sc){
+  const dist=Array.from({length:rows},()=>Array(cols).fill(Infinity));
+  const prev=Array.from({length:rows},()=>Array(cols).fill(null));
+  if(!isWalkable(sr,sc)) return{dist,prev};
+  dist[sr][sc]=0;const q=[[sr,sc]];let h=0;
+  const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  while(h<q.length){
+    const[r,c]=q[h++];
+    for(const[dr,dc]of dirs){
+      const nr=r+dr,nc=c+dc;
+      if(isWalkable(nr,nc)&&dist[nr][nc]===Infinity){dist[nr][nc]=dist[r][c]+1;prev[nr][nc]=[r,c];q.push([nr,nc]);}
+    }
+  }
+  return{dist,prev};
+}
+function nbrs(r,c){return[[r+1,c],[r-1,c],[r,c+1],[r,c-1]].filter(([a,b])=>isWalkable(a,b));}
+function rebuildPath(prev,er,ec){
+  const p=[];let cur=[er,ec];
+  while(cur){p.push(cur);const[r,c]=cur;cur=prev[r][c];}
+  return p.reverse();
+}
+function findCell(type){
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)if(grid[r][c]===type)return[r,c];
+  return null;
+}
+function matchItem(name,q){const n=name.toLowerCase(),s=q.toLowerCase();return n.includes(s)||s.includes(n);}
+
+function computeRoute(){
+  const entrance=findCell('entrance');
+  if(!entrance) return{error:'Defina uma "Entrada" na planta.'};
+  const checkout=findCell('checkout');
+  const shelfEntries=Object.entries(shelfProducts);
+  const found=[],missing=[];
+  const itemMatches={};
+  shoppingList.forEach(item=>{
+    const m=shelfEntries.filter(([k,ns])=>ns.some(n=>matchItem(n,item))).map(([k])=>k);
+    if(m.length){itemMatches[item]=m;found.push(item);}else missing.push(item);
+  });
+  if(!found.length) return{error:'Nenhum item encontrado nas prateleiras. Cadastre produtos primeiro.',missing};
+  let remaining=new Set();found.forEach(it=>itemMatches[it].forEach(k=>remaining.add(k)));
+  let current=entrance;const stops=[];const fullPath=[current];const warnings=[];
+  while(remaining.size>0){
+    const{dist,prev}=bfsFrom(current[0],current[1]);
+    let bestKey=null,bestDist=Infinity,bestNb=null;
+    remaining.forEach(k=>{
+      const[r,c]=k.split(',').map(Number);
+      nbrs(r,c).forEach(([nr,nc])=>{
+        if(dist[nr][nc]<bestDist){bestDist=dist[nr][nc];bestKey=k;bestNb=[nr,nc];}
+      });
+    });
+    if(!bestKey){
+      remaining.forEach(k=>{
+        shoppingList.filter(it=>(itemMatches[it]||[]).includes(k)).forEach(it=>{if(!missing.includes(it))missing.push(it);});
+      });
+      warnings.push('Algumas prateleiras não são acessíveis (verifique paredes que bloqueiam o acesso).');
+      remaining=new Set();break;
+    }
+    const seg=rebuildPath(prev,bestNb[0],bestNb[1]);
+    seg.shift();fullPath.push(...seg);current=bestNb;
+    const[sr,sc]=bestKey.split(',').map(Number);
+    const servedHere=shoppingList.filter(it=>(itemMatches[it]||[]).includes(bestKey));
+    stops.push({key:bestKey,r:sr,c:sc,items:servedHere});
+    remaining.delete(bestKey);
+    const stillNeeded=new Set();
+    found.forEach(it=>{
+      if(!stops.some(s=>s.items.includes(it)))(itemMatches[it]||[]).forEach(k=>stillNeeded.add(k));
+    });
+    remaining=new Set([...remaining].filter(k=>stillNeeded.has(k)));
+  }
+  if(checkout){
+    const{dist,prev}=bfsFrom(current[0],current[1]);
+    if(dist[checkout[0]][checkout[1]]<Infinity){
+      const seg=rebuildPath(prev,checkout[0],checkout[1]);seg.shift();fullPath.push(...seg);
+    } else warnings.push('Caixa não acessível a partir do último corredor.');
+  } else warnings.push('Nenhum caixa definido — rota termina na última prateleira.');
+  return{stops,fullPath,missing,warnings,totalSteps:fullPath.length-1,hasCheckout:!!checkout};
+}
+
+document.getElementById('findRouteBtn').onclick=()=>{
+  if(!shoppingList.length){alert('Adicione itens à lista de compras.');return;}
+  const result=computeRoute();
+  renderRouteResult(result);
+};
+
+// ─── Route rendering ──────────────────────────────────────────────────────────
+function clearRouteVisual(){
+  document.getElementById('routeOverlay').innerHTML='';
+  document.querySelectorAll('.cell.has-route').forEach(el=>el.classList.remove('has-route'));
+}
+
+function renderRouteResult(result){
+  const card=document.getElementById('routeCard');card.style.display='block';
+  const wEl=document.getElementById('routeWarning');
+  const lEl=document.getElementById('routeList');
+  const mEl=document.getElementById('missingBox');
+  const sEl=document.getElementById('routeStats');
+  wEl.innerHTML='';lEl.innerHTML='';mEl.innerHTML='';sEl.innerHTML='';
+  if(result.error){
+    wEl.innerHTML=`<div class="warn-box">${esc(result.error)}</div>`;
+    if(result.missing?.length) mEl.innerHTML=`<div class="missing-box"><b>Não encontrados</b>${result.missing.map(esc).join(', ')}</div>`;
+    clearRouteVisual();return;
+  }
+  result.warnings?.forEach(w=>{wEl.innerHTML+=`<div class="warn-box">${esc(w)}</div>`;});
+  result.stops.forEach(s=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<div><div>${s.items.map(esc).join(', ')}</div><div class="coord">prateleira [${s.r}, ${s.c}]</div></div>`;
+    lEl.appendChild(li);
+  });
+  if(result.missing?.length) mEl.innerHTML=`<div class="missing-box"><b>Não encontrados na planta</b><br>${result.missing.map(esc).join(', ')}</div>`;
+  sEl.textContent=`${result.stops.length} parada(s) · ${result.totalSteps} passos · ${result.hasCheckout?'termina no caixa':'termina na última prateleira'}`;
+  drawRoute(result);
+}
+
+function drawRoute(result){
+  clearRouteVisual();
+  const svg=document.getElementById('routeOverlay');
+  if(!result.fullPath||result.fullPath.length<2){result.stops?.forEach((s,i)=>drawBadge(svg,s,i));return;}
+  const pts=result.fullPath.map(([r,c])=>[c*CELL+CELL/2,r*CELL+CELL/2]);
+  const poly=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  poly.setAttribute('points',pts.map(p=>p.join(',')).join(' '));
+  poly.setAttribute('fill','none');poly.setAttribute('stroke','var(--amber)');
+  poly.setAttribute('stroke-width','4');poly.setAttribute('stroke-linecap','round');
+  poly.setAttribute('stroke-linejoin','round');poly.setAttribute('stroke-dasharray','1 10');
+  svg.appendChild(poly);
+  const[sx,sy]=pts[0];
+  const sc=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  sc.setAttribute('cx',sx);sc.setAttribute('cy',sy);sc.setAttribute('r',7);
+  sc.setAttribute('fill','var(--green)');sc.setAttribute('stroke','#fff');sc.setAttribute('stroke-width','2');
+  svg.appendChild(sc);
+  result.stops.forEach((s,i)=>{drawBadge(svg,s,i);
+    const el=document.querySelector(`.cell[data-r="${s.r}"][data-c="${s.c}"]`);
+    if(el)el.classList.add('has-route');
+  });
+}
+
+function drawBadge(svg,stop,idx){
+  const cx=stop.c*CELL+CELL/2,cy=stop.r*CELL+CELL/2-CELL*.5-4;
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+  const ci=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  ci.setAttribute('cx',cx);ci.setAttribute('cy',cy);ci.setAttribute('r',11);
+  ci.setAttribute('fill','var(--amber)');ci.setAttribute('stroke','#3a2a06');ci.setAttribute('stroke-width','1.4');
+  const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+  tx.setAttribute('x',cx);tx.setAttribute('y',cy+4);tx.setAttribute('text-anchor','middle');
+  tx.setAttribute('font-size','11');tx.setAttribute('font-family','IBM Plex Mono,monospace');
+  tx.setAttribute('fill','#3a2a06');tx.setAttribute('font-weight','600');tx.textContent=idx+1;
+  g.appendChild(ci);g.appendChild(tx);svg.appendChild(g);
+}
+
+// ─── Status pill ──────────────────────────────────────────────────────────────
+function setStatus(text,ok){
+  const p=document.getElementById('statusPill');p.textContent=text;
+  p.className='pill'+(ok?' ok':'');
+}
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+document.getElementById('changePassBtn').onclick=async()=>{
+  const cur=document.getElementById('curPassInput').value;
+  const neu=document.getElementById('newPassInput').value;
+  const err=document.getElementById('passErr');
+  try{await api('POST','/auth/change-password',{currentPassword:cur,newPassword:neu});
+    err.style.color='var(--green-deep)';err.textContent='Senha alterada com sucesso.';
+    document.getElementById('curPassInput').value='';document.getElementById('newPassInput').value='';
+  }catch(e){err.style.color='var(--danger)';err.textContent=e.message;}
+};
+document.getElementById('createMgrBtn').onclick=async()=>{
+  const u=document.getElementById('newMgrUser').value.trim();
+  const p=document.getElementById('newMgrPass').value;
+  const err=document.getElementById('mgrErr');
+  try{await api('POST','/auth/create-manager',{username:u,password:p});
+    err.style.color='var(--green-deep)';err.textContent=`Gerente "${u}" criado.`;
+    document.getElementById('newMgrUser').value='';document.getElementById('newMgrPass').value='';
+  }catch(e){err.style.color='var(--danger)';err.textContent=e.message;}
+};
+
+// ─── Utils ───────────────────────────────────────────────────────────────────
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+showGate();
+})();
+</script>
+</body>
+</html>
