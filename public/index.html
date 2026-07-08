@@ -173,6 +173,34 @@ svg.route-overlay{position:absolute;top:0;left:0;pointer-events:none;}
 datalist{display:none;}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .5s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+/* ── Seções do mercado ── */
+.cell.secao-padaria    { background:#C17B2F; color:#fff; }
+.cell.secao-acougue    { background:#9B2335; color:#fff; }
+.cell.secao-peixaria   { background:#1A6B8A; color:#fff; }
+.cell.secao-hortifruti { background:#3A7D2C; color:#fff; }
+.cell.secao-laticinios { background:#C4A020; color:#fff; }
+.cell.secao-bebidas    { background:#4A3080; color:#fff; }
+.cell.secao-limpeza    { background:#1A7A7A; color:#fff; }
+.cell.secao-congelados { background:#2660A4; color:#fff; }
+.cell.secao-pet        { background:#A05C20; color:#fff; }
+.cell.secao-farmacia   { background:#2E8B57; color:#fff; }
+.cell.secao-padaria.sel1,.cell.secao-acougue.sel1,.cell.secao-peixaria.sel1,
+.cell.secao-hortifruti.sel1,.cell.secao-laticinios.sel1,.cell.secao-bebidas.sel1,
+.cell.secao-limpeza.sel1,.cell.secao-congelados.sel1,.cell.secao-pet.sel1,.cell.secao-farmacia.sel1
+{ outline:3px solid var(--amber); outline-offset:-3px; z-index:2; }
+.cell.secao-padaria.sel-multi,.cell.secao-acougue.sel-multi,.cell.secao-peixaria.sel-multi,
+.cell.secao-hortifruti.sel-multi,.cell.secao-laticinios.sel-multi,.cell.secao-bebidas.sel-multi,
+.cell.secao-limpeza.sel-multi,.cell.secao-congelados.sel-multi,.cell.secao-pet.sel-multi,.cell.secao-farmacia.sel-multi
+{ outline:3px solid var(--merge); outline-offset:-3px; z-index:2; }
+.cell.secao-padaria.has-route,.cell.secao-acougue.has-route,.cell.secao-peixaria.has-route,
+.cell.secao-hortifruti.has-route,.cell.secao-laticinios.has-route,.cell.secao-bebidas.has-route,
+.cell.secao-limpeza.has-route,.cell.secao-congelados.has-route,.cell.secao-pet.has-route,.cell.secao-farmacia.has-route
+{ box-shadow:inset 0 0 0 3px var(--amber); }
+.cell-icon { font-size:18px; line-height:1; }
+.toolbar-group { display:flex; flex-direction:column; gap:4px; }
+.toolbar-group-label { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); padding:0 2px; }
+.toolbar-group-row { display:flex; gap:4px; flex-wrap:wrap; }
+
 </style>
 </head>
 <body>
@@ -254,16 +282,33 @@ datalist{display:none;}
       <!-- Grid -->
       <div class="card">
         <div class="lock-msg" id="lockMsg" style="display:none;">🔒 Modo cliente — visualização somente. Clique numa prateleira para ver os produtos.</div>
-        <div class="toolbar" id="editToolbar" style="display:none;">
-          <button class="tool-btn active" data-tool="select"><span class="swatch" style="background:#fff;border-style:dashed;"></span>Selecionar</button>
-          <button class="tool-btn" data-tool="entrance"><span class="swatch" style="background:var(--green)"></span>Entrada</button>
-          <button class="tool-btn" data-tool="checkout"><span class="swatch" style="background:var(--blue)"></span>Caixa</button>
-          <button class="tool-btn" data-tool="shelf"><span class="swatch" style="background:var(--terracotta)"></span>Prateleira</button>
-          <button class="tool-btn" data-tool="wall"><span class="swatch" style="background:var(--wall)"></span>Parede</button>
-          <button class="tool-btn" data-tool="empty"><span class="swatch" style="background:#fff;border:1px solid #ccc;"></span>Apagar</button>
-          <div class="sep"></div>
-          <button class="tool-btn" id="mergeModeBtn"><span class="swatch" style="background:var(--merge)"></span>🔀 Mesclar</button>
-          <div class="sep"></div>
+        <div class="toolbar" id="editToolbar" style="display:none;flex-direction:column;gap:8px;">
+          <div class="toolbar-group-row">
+            <button class="tool-btn active" data-tool="select"><span class="swatch" style="background:#fff;border-style:dashed;"></span>Selecionar</button>
+            <button class="tool-btn" data-tool="entrance"><span class="swatch" style="background:var(--green)"></span>Entrada</button>
+            <button class="tool-btn" data-tool="checkout"><span class="swatch" style="background:var(--blue)"></span>Caixa</button>
+            <button class="tool-btn" data-tool="shelf"><span class="swatch" style="background:var(--terracotta)"></span>🗂 Prateleira</button>
+            <button class="tool-btn" data-tool="wall"><span class="swatch" style="background:var(--wall)"></span>Parede</button>
+            <button class="tool-btn" data-tool="empty"><span class="swatch" style="background:#fff;border:1px solid #ccc;"></span>Apagar</button>
+            <div class="sep"></div>
+            <button class="tool-btn" id="mergeModeBtn"><span class="swatch" style="background:var(--merge)"></span>🔀 Mesclar</button>
+          </div>
+          <div class="toolbar-group">
+            <span class="toolbar-group-label">Seções do mercado</span>
+            <div class="toolbar-group-row">
+              <button class="tool-btn" data-tool="secao-padaria"><span class="swatch" style="background:#C17B2F"></span>🥖 Padaria</button>
+              <button class="tool-btn" data-tool="secao-acougue"><span class="swatch" style="background:#9B2335"></span>🥩 Açougue</button>
+              <button class="tool-btn" data-tool="secao-peixaria"><span class="swatch" style="background:#1A6B8A"></span>🐟 Peixaria</button>
+              <button class="tool-btn" data-tool="secao-hortifruti"><span class="swatch" style="background:#3A7D2C"></span>🥬 Hortifruti</button>
+              <button class="tool-btn" data-tool="secao-laticinios"><span class="swatch" style="background:#C4A020"></span>🧀 Laticínios</button>
+              <button class="tool-btn" data-tool="secao-bebidas"><span class="swatch" style="background:#4A3080"></span>🧃 Bebidas</button>
+              <button class="tool-btn" data-tool="secao-limpeza"><span class="swatch" style="background:#1A7A7A"></span>🧹 Limpeza</button>
+              <button class="tool-btn" data-tool="secao-congelados"><span class="swatch" style="background:#2660A4"></span>🧊 Congelados</button>
+              <button class="tool-btn" data-tool="secao-pet"><span class="swatch" style="background:#A05C20"></span>🐾 Pet</button>
+              <button class="tool-btn" data-tool="secao-farmacia"><span class="swatch" style="background:#2E8B57"></span>💊 Farmácia</button>
+            </div>
+          </div>
+          <div class="toolbar-group-row"></div>
           <div class="size-ctrl">
             Linhas <input id="rowsInput" type="number" min="4" max="20" value="9">
             Colunas <input id="colsInput" type="number" min="4" max="24" value="12">
@@ -285,6 +330,16 @@ datalist{display:none;}
           <span><i style="background:var(--wall)"></i>Parede</span>
           <span><i style="background:var(--amber)"></i>Rota</span>
           <span><i style="background:var(--merge);opacity:.7"></i>Mescla</span>
+          <span><i style="background:#C17B2F"></i>🥖Padaria</span>
+          <span><i style="background:#9B2335"></i>🥩Açougue</span>
+          <span><i style="background:#1A6B8A"></i>🐟Peixaria</span>
+          <span><i style="background:#3A7D2C"></i>🥬Hortifruti</span>
+          <span><i style="background:#C4A020"></i>🧀Laticínios</span>
+          <span><i style="background:#4A3080"></i>🧃Bebidas</span>
+          <span><i style="background:#1A7A7A"></i>🧹Limpeza</span>
+          <span><i style="background:#2660A4"></i>🧊Congelados</span>
+          <span><i style="background:#A05C20"></i>🐾Pet</span>
+          <span><i style="background:#2E8B57"></i>💊Farmácia</span>
         </div>
         <div class="meta-line" id="gridHint" style="display:none;">
           Clique/arraste para pintar. Ative <b>🔀 Mesclar</b> e clique nas prateleiras para selecioná-las.
@@ -392,6 +447,24 @@ let currentLayoutId = null, currentLayoutName = null;
 let isDirty = false;
 const CELL = 44;
 const API = '';  // same origin
+
+// ─── Seções do mercado ────────────────────────────────────────────────────────
+const SECTION_TYPES = new Set([
+  'secao-padaria','secao-acougue','secao-peixaria','secao-hortifruti',
+  'secao-laticinios','secao-bebidas','secao-limpeza','secao-congelados',
+  'secao-pet','secao-farmacia'
+]);
+const SECTION_ICONS = {
+  'secao-padaria':'🥖','secao-acougue':'🥩','secao-peixaria':'🐟',
+  'secao-hortifruti':'🥬','secao-laticinios':'🧀','secao-bebidas':'🧃',
+  'secao-limpeza':'🧹','secao-congelados':'🧊','secao-pet':'🐾','secao-farmacia':'💊'
+};
+const SECTION_NAMES = {
+  'secao-padaria':'Padaria','secao-acougue':'Açougue','secao-peixaria':'Peixaria',
+  'secao-hortifruti':'Hortifruti','secao-laticinios':'Laticínios','secao-bebidas':'Bebidas',
+  'secao-limpeza':'Limpeza','secao-congelados':'Congelados','secao-pet':'Pet','secao-farmacia':'Farmácia'
+};
+function isShelfLike(type){ return type==='shelf' || SECTION_TYPES.has(type); }
 
 // ─── API helper ───────────────────────────────────────────────────────────────
 async function api(method, path, body){
@@ -501,21 +574,25 @@ function applyRoleUI(){
 
 // ─── Grid state ───────────────────────────────────────────────────────────────
 function defaultDemo(){
-  rows=9; cols=12;
+  rows=10; cols=14;
   grid=emptyGrid(rows,cols); shelfProducts={};
   grid[0][0]='entrance'; grid[rows-1][cols-1]='checkout';
   const shelves=[
-    {r:1,c:2,items:['arroz','feijão','macarrão','farinha']},
-    {r:1,c:5,items:['açúcar','sal','óleo','vinagre']},
-    {r:1,c:8,items:['biscoito','salgadinho','granola']},
-    {r:4,c:2,items:['leite','iogurte','queijo','manteiga']},
-    {r:4,c:5,items:['frango','carne moída','linguiça']},
-    {r:4,c:8,items:['detergente','sabão em pó','amaciante']},
-    {r:6,c:3,items:['maçã','banana','tomate','cebola','alho']},
-    {r:6,c:8,items:['refrigerante','suco','água','cerveja']},
+    {r:1,c:2,type:'shelf',         items:['arroz','feijão','macarrão','farinha','açúcar','sal','óleo']},
+    {r:1,c:5,type:'shelf',         items:['biscoito','salgadinho','granola','achocolatado']},
+    {r:1,c:9,type:'secao-bebidas', items:['refrigerante','suco','água','cerveja','vinho']},
+    {r:3,c:2,type:'secao-laticinios',items:['leite','iogurte','queijo','manteiga','creme de leite']},
+    {r:3,c:5,type:'secao-acougue', items:['frango','carne moída','linguiça','costela','filé']},
+    {r:3,c:8,type:'secao-peixaria',items:['salmão','tilápia','camarão','atum','sardinha']},
+    {r:5,c:2,type:'secao-hortifruti',items:['maçã','banana','tomate','cebola','alho','alface','cenoura']},
+    {r:5,c:5,type:'secao-padaria', items:['pão francês','bolo','croissant','torta','pão de queijo']},
+    {r:5,c:8,type:'secao-limpeza', items:['detergente','sabão em pó','amaciante','desinfetante']},
+    {r:7,c:3,type:'secao-congelados',items:['pizza congelada','sorvete','frango congelado','lasanha']},
+    {r:7,c:7,type:'secao-pet',     items:['ração cachorro','ração gato','areia sanitária','petisco']},
+    {r:7,c:10,type:'secao-farmacia',items:['protetor solar','shampoo','condicionador','vitamina C']},
   ];
   shelves.forEach(s=>{
-    grid[s.r][s.c]='shelf';
+    grid[s.r][s.c]=s.type;
     shelfProducts[s.r+','+s.c]=s.items.slice();
   });
   currentLayoutId=null; currentLayoutName=null; isDirty=false;
@@ -653,9 +730,13 @@ function renderGrid(){
       div.dataset.r=r; div.dataset.c=c;
       if(type==='entrance') div.textContent='➜';
       if(type==='checkout') div.textContent='✓';
-      if(type==='shelf'){
+      if(isShelfLike(type)){
         if(key===primarySel) div.classList.add('sel1');
         if(multiSel.has(key)) div.classList.add('sel-multi');
+        if(SECTION_ICONS[type]){
+          const ico=document.createElement('span');
+          ico.className='cell-icon';ico.textContent=SECTION_ICONS[type];div.appendChild(ico);
+        }
         const n=(shelfProducts[key]||[]).length;
         if(n>0){
           const b=document.createElement('span');
@@ -680,7 +761,7 @@ function handleCell(r,c,e){
   const key=cellKey(r,c);
 
   if(mergeMode && userRole==='manager'){
-    if(grid[r][c]==='shelf'){
+    if(isShelfLike(grid[r][c])){
       if(multiSel.has(key)) multiSel.delete(key);
       else multiSel.add(key);
       primarySel = multiSel.size===0 ? null : (primarySel||key);
@@ -690,7 +771,7 @@ function handleCell(r,c,e){
   }
 
   if(userRole!=='manager' || currentTool==='select'){
-    if(grid[r][c]==='shelf'){
+    if(isShelfLike(grid[r][c])){
       primarySel=key; multiSel=new Set();
       renderGrid(); renderShelfPanel(); clearRouteVisual();
     }
@@ -698,9 +779,9 @@ function handleCell(r,c,e){
   }
   if(currentTool!=='select'){
     grid[r][c]=currentTool;
-    if(currentTool!=='shelf' && shelfProducts[key]) delete shelfProducts[key];
-    if(currentTool==='shelf' && !shelfProducts[key]) shelfProducts[key]=[];
-    if(currentTool!=='shelf'){if(primarySel===key){primarySel=null;} multiSel.delete(key);}
+    if(!isShelfLike(currentTool) && shelfProducts[key]) delete shelfProducts[key];
+    if(isShelfLike(currentTool) && !shelfProducts[key]) shelfProducts[key]=[];
+    if(!isShelfLike(currentTool)){if(primarySel===key){primarySel=null;} multiSel.delete(key);}
     renderGrid(); renderShelfPanel(); clearRouteVisual(); markDirty();
   }
 }
@@ -724,7 +805,9 @@ function renderSingleShelf(){
   const inner=document.getElementById('shelfEditorInner');
   if(!primarySel){ info.textContent='Nenhuma prateleira selecionada.'; inner.style.display='none'; return; }
   const [r,c]=primarySel.split(',').map(Number);
-  info.innerHTML=`Prateleira <span class="mono">[${r}, ${c}]</span>`;
+  const cellType=grid[r][c];
+  const sectionLabel = SECTION_NAMES[cellType] ? `${SECTION_ICONS[cellType]} ${SECTION_NAMES[cellType]}` : 'Prateleira';
+  info.innerHTML=`${sectionLabel} <span class="mono">[${r}, ${c}]</span>`;
   inner.style.display='block';
   document.getElementById('productInputRow').style.display = userRole==='manager' ? 'flex' : 'none';
   const tagsEl=document.getElementById('productTags');
@@ -923,7 +1006,11 @@ function computeRoute(){
   const entrance=findCell('entrance');
   if(!entrance) return{error:'Defina uma "Entrada" na planta.'};
   const checkout=findCell('checkout');
-  const shelfEntries=Object.entries(shelfProducts);
+  // inclui tanto prateleiras quanto seções especiais
+  const shelfEntries=Object.entries(shelfProducts).filter(([k])=>{
+    const[r,c]=k.split(',').map(Number);
+    return isShelfLike(grid[r]?.[c]);
+  });
   const found=[],missing=[];
   const itemMatches={};
   shoppingList.forEach(item=>{
@@ -953,7 +1040,9 @@ function computeRoute(){
     seg.shift();fullPath.push(...seg);current=bestNb;
     const[sr,sc]=bestKey.split(',').map(Number);
     const servedHere=shoppingList.filter(it=>(itemMatches[it]||[]).includes(bestKey));
-    stops.push({key:bestKey,r:sr,c:sc,items:servedHere});
+    const cellT=grid[sr][sc];
+    const stopLabel=SECTION_NAMES[cellT]?(SECTION_ICONS[cellT]+' '+SECTION_NAMES[cellT]):'Prateleira';
+    stops.push({key:bestKey,r:sr,c:sc,items:servedHere,label:stopLabel});
     remaining.delete(bestKey);
     const stillNeeded=new Set();
     found.forEach(it=>{
@@ -997,7 +1086,7 @@ function renderRouteResult(result){
   result.warnings?.forEach(w=>{wEl.innerHTML+=`<div class="warn-box">${esc(w)}</div>`;});
   result.stops.forEach(s=>{
     const li=document.createElement('li');
-    li.innerHTML=`<div><div>${s.items.map(esc).join(', ')}</div><div class="coord">prateleira [${s.r}, ${s.c}]</div></div>`;
+    li.innerHTML=`<div><div>${s.items.map(esc).join(', ')}</div><div class="coord">${s.label||'Prateleira'} [${s.r}, ${s.c}]</div></div>`;
     lEl.appendChild(li);
   });
   if(result.missing?.length) mEl.innerHTML=`<div class="missing-box"><b>Não encontrados na planta</b><br>${result.missing.map(esc).join(', ')}</div>`;
