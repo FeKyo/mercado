@@ -173,6 +173,35 @@ svg.route-overlay{position:absolute;top:0;left:0;pointer-events:none;}
 datalist{display:none;}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .5s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+/* ── Tabs na gate ── */
+.gate-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:2px solid var(--line);}
+.gate-tab{background:none;border:none;padding:9px 16px;font-size:14px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;color:var(--ink-soft);border-bottom:2px solid transparent;margin-bottom:-2px;}
+.gate-tab.active{color:var(--green-deep);border-bottom-color:var(--green);font-weight:600;}
+
+/* ── Listas de compras ── */
+.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.saved-lists{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;margin-bottom:10px;}
+.saved-list-item{display:flex;align-items:center;gap:8px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--white);cursor:pointer;font-size:13px;transition:border-color .1s;}
+.saved-list-item:hover{border-color:var(--green);}
+.saved-list-item.active-list{border-color:var(--green);background:#EBF3EE;}
+.saved-list-item .list-name{flex:1;font-weight:500;}
+.saved-list-item .list-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+.saved-list-item .list-count{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--paper-dark);border-radius:10px;padding:2px 7px;}
+.list-actions{display:flex;gap:4px;}
+.list-actions button{font-size:11.5px;border:none;border-radius:5px;padding:3px 8px;cursor:pointer;background:var(--paper-dark);color:var(--ink-soft);}
+.list-actions button:hover{background:var(--line);color:var(--ink);}
+.list-actions .load-btn{background:#D8EDE2;color:var(--green-deep);}
+.list-actions .del-btn:hover{background:var(--danger-soft);color:var(--danger);}
+.save-list-row{display:flex;gap:6px;margin-top:8px;}
+.save-list-row input{flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:7px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;}
+.save-list-row .btn-sm{border:none;background:var(--green);color:#fff;border-radius:7px;padding:0 12px;cursor:pointer;font-size:13px;font-weight:500;}
+.active-list-bar{display:flex;align-items:center;gap:8px;background:#EBF3EE;border:1px solid var(--green);border-radius:8px;padding:8px 11px;margin-bottom:8px;font-size:13px;}
+.active-list-bar .list-bar-name{flex:1;font-weight:500;color:var(--green-deep);}
+.active-list-bar button{border:none;background:none;cursor:pointer;font-size:12px;color:var(--ink-soft);text-decoration:underline;}
+.no-lists{font-size:12.5px;color:var(--ink-soft);font-style:italic;}
+.guest-hint{font-size:12.5px;color:var(--ink-soft);background:var(--paper-dark);border-radius:7px;padding:8px 10px;margin-bottom:8px;}
+.guest-hint a{color:var(--green-deep);cursor:pointer;text-decoration:underline;}
+
 /* ── Seções do mercado ── */
 .cell.secao-padaria    { background:#C17B2F; color:#fff; }
 .cell.secao-acougue    { background:#9B2335; color:#fff; }
@@ -210,30 +239,61 @@ datalist{display:none;}
   <div class="gate-card">
     <span class="eyebrow">Mercado Virtual</span>
     <h2>Bem-vindo(a)</h2>
-    <p>Clientes veem o mapa e planejam a rota. Gerentes editam a planta da loja.</p>
 
-    <button class="role-opt" id="guestBtn">
-      <span class="ico">🛒</span>
-      <span><b>Entrar como cliente</b><span>Visualizar mapa e calcular rota de compras</span></span>
-    </button>
-
-    <button class="role-opt" id="managerBtn">
-      <span class="ico">🗝️</span>
-      <span><b>Entrar como gerente</b><span>Editar planta, prateleiras e produtos</span></span>
-    </button>
-
-    <div class="login-form" id="loginForm">
-      <label>Usuário</label>
-      <input type="text" id="loginUser" autocomplete="username" placeholder="gerente">
-      <label>Senha</label>
-      <input type="password" id="loginPass" autocomplete="current-password" placeholder="••••">
-      <div class="err-msg" id="loginErr"></div>
-      <button class="btn-primary" id="loginSubmitBtn">Entrar <span id="loginSpinner" style="display:none;" class="spinner"></span></button>
-      <br><button class="back-link" id="loginBack">← voltar</button>
+    <!-- Opções iniciais -->
+    <div id="gateOptions">
+      <button class="role-opt" id="guestBtn">
+        <span class="ico">🛒</span>
+        <span><b>Continuar sem conta</b><span>Ver mapa e calcular rota — lista não será salva</span></span>
+      </button>
+      <button class="role-opt" id="customerLoginBtn">
+        <span class="ico">👤</span>
+        <span><b>Entrar como cliente</b><span>Salvar e carregar suas listas de compras</span></span>
+      </button>
+      <button class="role-opt" id="managerBtn">
+        <span class="ico">🗝️</span>
+        <span><b>Sou gerente</b><span>Editar planta, prateleiras e produtos</span></span>
+      </button>
     </div>
 
-    <div class="gate-note">
-      O acesso de gerente exige credenciais verificadas no servidor. Clientes não precisam de conta — apenas visualizam o mapa publicado.
+    <!-- Login cliente / cadastro -->
+    <div class="login-form" id="customerForm">
+      <div class="gate-tabs">
+        <button class="gate-tab active" id="tabLogin">Entrar</button>
+        <button class="gate-tab" id="tabRegister">Criar conta</button>
+      </div>
+      <div id="loginSection">
+        <label>Usuário</label>
+        <input type="text" id="loginUser" autocomplete="username" placeholder="seu usuário">
+        <label>Senha</label>
+        <input type="password" id="loginPass" autocomplete="current-password" placeholder="••••">
+        <div class="err-msg" id="loginErr"></div>
+        <button class="btn-primary" id="loginSubmitBtn">Entrar <span id="loginSpinner" style="display:none;" class="spinner"></span></button>
+      </div>
+      <div id="registerSection" style="display:none;">
+        <label>Usuário</label>
+        <input type="text" id="regUser" autocomplete="username" placeholder="escolha um usuário">
+        <label>Senha</label>
+        <input type="password" id="regPass" autocomplete="new-password" placeholder="mínimo 4 caracteres">
+        <div class="err-msg" id="regErr"></div>
+        <button class="btn-primary" id="registerBtn">Criar conta <span id="regSpinner" style="display:none;" class="spinner"></span></button>
+      </div>
+      <br><button class="back-link" id="customerBack">← voltar</button>
+    </div>
+
+    <!-- Login gerente -->
+    <div class="login-form" id="managerForm">
+      <label>Usuário do gerente</label>
+      <input type="text" id="mgrLoginUser" autocomplete="username" placeholder="gerente">
+      <label>Senha</label>
+      <input type="password" id="mgrLoginPass" autocomplete="current-password" placeholder="••••">
+      <div class="err-msg" id="mgrLoginErr"></div>
+      <button class="btn-primary" id="mgrLoginSubmitBtn">Entrar <span id="mgrLoginSpinner" style="display:none;" class="spinner"></span></button>
+      <br><button class="back-link" id="managerBack">← voltar</button>
+    </div>
+
+    <div class="gate-note" id="gateNote">
+      Clientes com conta podem salvar suas listas de compras. Gerentes precisam de credenciais para editar a planta.
     </div>
   </div>
 </div>
@@ -381,6 +441,28 @@ datalist{display:none;}
         </div>
       </div>
 
+      <!-- Listas salvas (clientes logados) -->
+      <div class="card" id="savedListsCard">
+        <div class="list-header">
+          <div class="panel-title" style="margin-bottom:0;">📋 Minhas listas salvas</div>
+          <button class="ghost-btn" id="refreshListsBtn" style="font-size:11.5px;">↻</button>
+        </div>
+        <div id="guestHintBox" class="guest-hint" style="display:none;">
+          <a id="loginToSaveLink">Entre com sua conta</a> para salvar e reutilizar suas listas de compras.
+        </div>
+        <div id="activeListBar" style="display:none;" class="active-list-bar">
+          <span>📋</span>
+          <span class="list-bar-name" id="activeListName">—</span>
+          <button id="saveToActiveBtn">💾 Salvar alterações</button>
+          <button id="detachListBtn">✕</button>
+        </div>
+        <div class="saved-lists" id="savedListsEl"><span class="no-lists">Nenhuma lista salva.</span></div>
+        <div class="save-list-row">
+          <input type="text" id="newListNameInput" placeholder="Nome da nova lista…">
+          <button class="btn-sm" id="saveNewListBtn">Salvar atual</button>
+        </div>
+      </div>
+
       <!-- Shopping list -->
       <div class="card">
         <div class="panel-title">Lista de compras</div>
@@ -445,6 +527,7 @@ let shoppingList = [];
 let isPainting = false;
 let currentLayoutId = null, currentLayoutName = null;
 let isDirty = false;
+let activeListId = null; // lista de compras atualmente carregada
 const CELL = 44;
 const API = '';  // same origin
 
@@ -480,52 +563,118 @@ async function api(method, path, body){
 function showGate(){
   document.getElementById('loginGate').style.display='flex';
   document.getElementById('appRoot').style.display='none';
-  document.getElementById('loginForm').style.display='none';
+  document.getElementById('gateOptions').style.display='block';
+  document.getElementById('customerForm').style.display='none';
+  document.getElementById('managerForm').style.display='none';
   document.getElementById('loginErr').textContent='';
+  document.getElementById('mgrLoginErr').textContent='';
 }
-
 function hideGate(){
   document.getElementById('loginGate').style.display='none';
   document.getElementById('appRoot').style.display='';
 }
 
+// Opções iniciais
 document.getElementById('guestBtn').onclick = async () => {
-  authToken=null; userRole='customer'; username='Cliente';
+  authToken=null; userRole='guest'; username='Visitante';
   await enterApp();
 };
-
-document.getElementById('managerBtn').onclick = () => {
-  document.getElementById('loginForm').style.display='block';
+document.getElementById('customerLoginBtn').onclick = () => {
+  document.getElementById('gateOptions').style.display='none';
+  document.getElementById('customerForm').style.display='block';
   document.getElementById('loginUser').focus();
 };
-
-document.getElementById('loginBack').onclick = () => {
-  document.getElementById('loginForm').style.display='none';
+document.getElementById('managerBtn').onclick = () => {
+  document.getElementById('gateOptions').style.display='none';
+  document.getElementById('managerForm').style.display='block';
+  document.getElementById('mgrLoginUser').focus();
+};
+document.getElementById('customerBack').onclick = () => {
+  document.getElementById('customerForm').style.display='none';
+  document.getElementById('gateOptions').style.display='block';
+};
+document.getElementById('managerBack').onclick = () => {
+  document.getElementById('managerForm').style.display='none';
+  document.getElementById('gateOptions').style.display='block';
 };
 
-async function doLogin(){
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
+// Tabs login/cadastro
+document.getElementById('tabLogin').onclick = () => {
+  document.getElementById('tabLogin').classList.add('active');
+  document.getElementById('tabRegister').classList.remove('active');
+  document.getElementById('loginSection').style.display='block';
+  document.getElementById('registerSection').style.display='none';
+};
+document.getElementById('tabRegister').onclick = () => {
+  document.getElementById('tabRegister').classList.add('active');
+  document.getElementById('tabLogin').classList.remove('active');
+  document.getElementById('registerSection').style.display='block';
+  document.getElementById('loginSection').style.display='none';
+};
+
+// Login cliente
+async function doCustomerLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
   if(!u||!p){document.getElementById('loginErr').textContent='Preencha usuário e senha.';return;}
-  const btn = document.getElementById('loginSubmitBtn');
+  const btn=document.getElementById('loginSubmitBtn');
   btn.disabled=true; document.getElementById('loginSpinner').style.display='inline-block';
   try{
-    const res = await api('POST','/auth/login',{username:u,password:p});
-    authToken=res.token; userRole=res.role; username=res.username;
+    const res=await api('POST','/auth/login',{username:u,password:p});
+    if(res.role==='manager'){document.getElementById('loginErr').textContent='Use o acesso de gerente.';return;}
+    authToken=res.token; userRole='customer'; username=res.username;
     await enterApp();
-  }catch(e){
-    document.getElementById('loginErr').textContent=e.message;
-  }finally{
-    btn.disabled=false; document.getElementById('loginSpinner').style.display='none';
-  }
+  }catch(e){document.getElementById('loginErr').textContent=e.message;}
+  finally{btn.disabled=false;document.getElementById('loginSpinner').style.display='none';}
 }
-document.getElementById('loginSubmitBtn').onclick=doLogin;
-document.getElementById('loginPass').onkeydown=e=>{if(e.key==='Enter')doLogin();};
+document.getElementById('loginSubmitBtn').onclick=doCustomerLogin;
+document.getElementById('loginPass').onkeydown=e=>{if(e.key==='Enter')doCustomerLogin();};
+
+// Cadastro cliente
+async function doRegister(){
+  const u=document.getElementById('regUser').value.trim();
+  const p=document.getElementById('regPass').value;
+  if(!u||!p){document.getElementById('regErr').textContent='Preencha todos os campos.';return;}
+  const btn=document.getElementById('registerBtn');
+  btn.disabled=true; document.getElementById('regSpinner').style.display='inline-block';
+  try{
+    await api('POST','/auth/register',{username:u,password:p});
+    // auto-login após cadastro
+    const res=await api('POST','/auth/login',{username:u,password:p});
+    authToken=res.token; userRole='customer'; username=res.username;
+    await enterApp();
+  }catch(e){document.getElementById('regErr').textContent=e.message;}
+  finally{btn.disabled=false;document.getElementById('regSpinner').style.display='none';}
+}
+document.getElementById('registerBtn').onclick=doRegister;
+document.getElementById('regPass').onkeydown=e=>{if(e.key==='Enter')doRegister();};
+
+// Login gerente
+async function doManagerLogin(){
+  const u=document.getElementById('mgrLoginUser').value.trim();
+  const p=document.getElementById('mgrLoginPass').value;
+  if(!u||!p){document.getElementById('mgrLoginErr').textContent='Preencha usuário e senha.';return;}
+  const btn=document.getElementById('mgrLoginSubmitBtn');
+  btn.disabled=true; document.getElementById('mgrLoginSpinner').style.display='inline-block';
+  try{
+    const res=await api('POST','/auth/login',{username:u,password:p});
+    if(res.role!=='manager'){document.getElementById('mgrLoginErr').textContent='Esse usuário não é gerente.';return;}
+    authToken=res.token; userRole='manager'; username=res.username;
+    await enterApp();
+  }catch(e){document.getElementById('mgrLoginErr').textContent=e.message;}
+  finally{btn.disabled=false;document.getElementById('mgrLoginSpinner').style.display='none';}
+}
+document.getElementById('mgrLoginSubmitBtn').onclick=doManagerLogin;
+document.getElementById('mgrLoginPass').onkeydown=e=>{if(e.key==='Enter')doManagerLogin();};
 
 document.getElementById('switchBtn').onclick=()=>{
-  authToken=null; userRole=null; username=null; currentLayoutId=null; isDirty=false;
+  authToken=null; userRole=null; username=null;
+  currentLayoutId=null; isDirty=false; activeListId=null;
   showGate();
 };
+
+// Link "entre com sua conta" no hint de visitante
+document.getElementById('loginToSaveLink').onclick=()=>showGate();
 
 // ─── Enter app ────────────────────────────────────────────────────────────────
 async function enterApp(){
@@ -533,13 +682,11 @@ async function enterApp(){
   applyRoleUI();
   if(userRole==='manager'){
     await loadLibrary();
-    // load most recent active or first layout
     const lib = await api('GET','/layouts');
     const active = lib.find(l=>l.is_active) || lib[0];
     if(active) await loadLayout(active.id);
     else { defaultDemo(); renderAll(); }
   } else {
-    // customer: load active layout from server
     try{
       const layout = await api('GET','/layouts/active');
       if(layout && layout.data){
@@ -555,19 +702,32 @@ async function enterApp(){
       setStatus('Não foi possível carregar a planta', false);
     }
     renderAll();
+    if(userRole==='customer') await loadSavedLists();
   }
 }
 
 function applyRoleUI(){
   const isMgr = userRole==='manager';
-  document.getElementById('roleBadge').textContent = isMgr ? username+' (Gerente)' : 'Cliente';
+  const isCustomer = userRole==='customer';
+  const isGuest = userRole==='guest';
+  // badge
+  const label = isMgr ? username+' (Gerente)' : isCustomer ? username : 'Visitante';
+  document.getElementById('roleBadge').textContent = label;
   document.getElementById('roleBadge').className = 'tag-role' + (isMgr ? '' : ' customer');
+  // grid
   document.getElementById('editToolbar').style.display = isMgr ? 'flex' : 'none';
   document.getElementById('lockMsg').style.display = isMgr ? 'none' : 'block';
   document.getElementById('gridHint').style.display = isMgr ? 'block' : 'none';
+  // paineis
   document.getElementById('libraryPanel').style.display = isMgr ? 'block' : 'none';
   document.getElementById('settingsCard').style.display = isMgr ? 'block' : 'none';
   document.getElementById('productInputRow').style.display = isMgr ? 'flex' : 'none';
+  // listas salvas
+  document.getElementById('savedListsCard').style.display = (isCustomer||isGuest) ? 'block' : 'none';
+  document.getElementById('guestHintBox').style.display = isGuest ? 'block' : 'none';
+  document.getElementById('savedListsEl').style.display = isGuest ? 'none' : 'block';
+  document.getElementById('newListNameInput').parentElement.style.display = isGuest ? 'none' : 'flex';
+  // título
   if(isMgr) document.getElementById('headerTitle').textContent='Mercado Virtual — Painel do Gerente';
   else document.getElementById('headerTitle').textContent='Mercado Virtual';
 }
@@ -954,6 +1114,11 @@ function renderShopTags(){
   const el=document.getElementById('shopTags');
   el.innerHTML='';
   document.getElementById('shopHint').style.display=shoppingList.length?'none':'block';
+  // atualiza badge de contagem na lista ativa
+  if(activeListId){
+    const rows=document.querySelectorAll('.saved-list-item.active-list .list-count');
+    rows.forEach(r=>r.textContent=shoppingList.length+' itens');
+  }
   shoppingList.forEach((item,i)=>{
     const t=document.createElement('span');t.className='tag shop-tag';
     t.innerHTML=`${esc(item)} <button>×</button>`;
@@ -1153,6 +1318,89 @@ document.getElementById('createMgrBtn').onclick=async()=>{
     err.style.color='var(--green-deep)';err.textContent=`Gerente "${u}" criado.`;
     document.getElementById('newMgrUser').value='';document.getElementById('newMgrPass').value='';
   }catch(e){err.style.color='var(--danger)';err.textContent=e.message;}
+};
+
+
+// ─── Listas de compras salvas ─────────────────────────────────────────────────
+async function loadSavedLists(){
+  if(userRole!=='customer') return;
+  try{
+    const lists = await api('GET','/shopping-lists');
+    renderSavedLists(lists);
+  }catch(e){ console.warn('Erro ao carregar listas:', e.message); }
+}
+
+function renderSavedLists(lists){
+  const el=document.getElementById('savedListsEl');
+  el.innerHTML='';
+  if(!lists||!lists.length){
+    el.innerHTML='<span class="no-lists">Nenhuma lista salva ainda.</span>';
+    return;
+  }
+  lists.forEach(l=>{
+    const row=document.createElement('div');
+    row.className='saved-list-item'+(l.id===activeListId?' active-list':'');
+    const date=l.updated_at?l.updated_at.slice(0,16):'';
+    row.innerHTML=`
+      <span class="list-name">${esc(l.name)}</span>
+      <span class="list-count">${(l.items||[]).length} itens</span>
+      <span class="list-date">${date}</span>
+      <div class="list-actions">
+        <button class="load-btn" title="Carregar lista">Carregar</button>
+        <button class="del-btn" title="Excluir">🗑</button>
+      </div>`;
+    row.querySelector('.load-btn').onclick=async()=>{
+      shoppingList=[...(l.items||[])];
+      activeListId=l.id;
+      document.getElementById('activeListBar').style.display='flex';
+      document.getElementById('activeListName').textContent=l.name;
+      renderShopTags();
+      await loadSavedLists();
+    };
+    row.querySelector('.del-btn').onclick=async()=>{
+      if(!confirm(`Excluir "${l.name}"?`)) return;
+      try{
+        await api('DELETE',`/shopping-lists/${l.id}`);
+        if(activeListId===l.id){ activeListId=null; document.getElementById('activeListBar').style.display='none'; }
+        await loadSavedLists();
+      }catch(e){alert(e.message);}
+    };
+    el.appendChild(row);
+  });
+}
+
+async function saveNewList(){
+  const nameInput=document.getElementById('newListNameInput');
+  const name=nameInput.value.trim();
+  if(!name){alert('Digite um nome para a lista.');return;}
+  if(!shoppingList.length){alert('Adicione itens à lista antes de salvar.');return;}
+  try{
+    const res=await api('POST','/shopping-lists',{name,items:shoppingList});
+    activeListId=res.id;
+    document.getElementById('activeListBar').style.display='flex';
+    document.getElementById('activeListName').textContent=name;
+    nameInput.value='';
+    await loadSavedLists();
+  }catch(e){alert(e.message);}
+}
+
+async function saveToActiveList(){
+  if(!activeListId){alert('Nenhuma lista ativa. Salve como nova lista.');return;}
+  try{
+    const name=document.getElementById('activeListName').textContent;
+    await api('PUT',`/shopping-lists/${activeListId}`,{name,items:shoppingList});
+    await loadSavedLists();
+    setStatus('Lista salva',true);
+  }catch(e){alert(e.message);}
+}
+
+document.getElementById('saveNewListBtn').onclick=saveNewList;
+document.getElementById('saveToActiveBtn').onclick=saveToActiveList;
+document.getElementById('refreshListsBtn').onclick=loadSavedLists;
+document.getElementById('detachListBtn').onclick=()=>{
+  activeListId=null;
+  document.getElementById('activeListBar').style.display='none';
+  loadSavedLists();
 };
 
 // ─── Utils ───────────────────────────────────────────────────────────────────
