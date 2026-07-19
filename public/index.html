@@ -173,6 +173,62 @@ svg.route-overlay{position:absolute;top:0;left:0;pointer-events:none;}
 datalist{display:none;}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .5s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+/* ── Preço e orientação ── */
+.product-input-grid{display:grid;grid-template-columns:1fr 80px auto;gap:6px;margin-bottom:8px;align-items:center;}
+.product-input-grid input{padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:13.5px;font-family:'IBM Plex Sans',sans-serif;}
+.product-input-grid input:focus{outline:2px solid var(--amber);outline-offset:1px;}
+.price-input{font-family:'IBM Plex Mono',monospace !important;text-align:right;}
+.product-input-grid button{border:none;background:var(--ink);color:var(--paper);border-radius:7px;padding:0 12px;cursor:pointer;font-size:13px;font-weight:500;white-space:nowrap;}
+.tag.shelf-tag .tag-price{font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:.7;margin-left:4px;}
+.orient-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.orient-label{font-size:12px;color:var(--ink-soft);white-space:nowrap;}
+.tag-price{font-family:'IBM Plex Mono',monospace;font-size:11px;background:rgba(0,0,0,.12);border-radius:10px;padding:1px 6px;margin-left:2px;}
+.tag-edit-price{border:none;background:none;cursor:pointer;font-size:11px;opacity:.55;padding:0 2px;}
+.tag-edit-price:hover{opacity:1;}
+.price-inline-edit{display:none;align-items:center;gap:4px;margin-top:4px;}
+.price-inline-edit input{width:80px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:right;}
+.price-inline-edit button{border:none;background:var(--green);color:#fff;border-radius:5px;padding:3px 8px;cursor:pointer;font-size:12px;}
+.orient-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.orient-active-info{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+
+.orient-btn{border:1.5px solid var(--line);background:var(--white);color:var(--ink);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:13px;line-height:1;}
+.orient-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.cell-orient{position:absolute;top:2px;right:3px;font-size:10px;line-height:1;opacity:.85;}
+.route-item-price{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+.route-total{font-weight:600;font-size:13px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-family:'IBM Plex Mono',monospace;}
+
+/* ── Overlay de estoque nas células ── */
+.cell .stock-bar{
+  position:absolute; bottom:0; left:0; right:0; height:4px; border-radius:0 0 2px 2px;
+}
+.cell .stock-icon{
+  position:absolute; top:2px; left:3px; font-size:9px; line-height:1;
+}
+.stock-ok   { background:var(--green); }
+.stock-mid  { background:var(--amber); }
+.stock-low  { background:var(--danger); animation: pulse-red 1s infinite; }
+.stock-empty{ background:#ccc; }
+@keyframes pulse-red{ 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+/* ── Card de hardware no painel do gerente ── */
+.hw-card-inner{ display:flex; flex-direction:column; gap:8px; }
+.hw-token-row{ display:flex; align-items:center; gap:8px; font-size:12.5px;
+  border:1px solid var(--line); border-radius:7px; padding:8px 10px; background:var(--white); }
+.hw-token-row .hw-label{ flex:1; font-weight:500; }
+.hw-token-row .hw-token{ font-family:'IBM Plex Mono',monospace; font-size:11px;
+  color:var(--ink-soft); background:var(--paper-dark); padding:2px 6px; border-radius:4px; }
+.hw-token-row button{ font-size:11.5px; border:none; border-radius:5px; padding:3px 8px;
+  cursor:pointer; background:var(--paper-dark); color:var(--ink-soft); }
+.hw-token-row button:hover{ background:var(--danger-soft); color:var(--danger); }
+.gen-token-row{ display:flex; gap:6px; }
+.gen-token-row input{ flex:1; padding:7px 9px; border:1px solid var(--line);
+  border-radius:7px; font-size:13px; font-family:'IBM Plex Sans',sans-serif; }
+.gen-token-row .btn-sm{ border:none; background:var(--ink); color:var(--paper);
+  border-radius:7px; padding:0 12px; cursor:pointer; font-size:13px; font-weight:500; }
+.token-result{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; word-break:break-all;
+  background:var(--amber-soft); border:1px solid var(--amber); border-radius:7px;
+  padding:8px 10px; margin-top:6px; display:none; }
+
 /* ── Tabs na gate ── */
 .gate-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:2px solid var(--line);}
 .gate-tab{background:none;border:none;padding:9px 16px;font-size:14px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;color:var(--ink-soft);border-bottom:2px solid transparent;margin-bottom:-2px;}
@@ -419,9 +475,20 @@ datalist{display:none;}
         <div id="singleShelfEditor">
           <div class="selected-info" id="selectedInfo">Nenhuma prateleira selecionada.</div>
           <div id="shelfEditorInner" style="display:none;">
-            <div class="tag-input-row" id="productInputRow" style="display:none;">
-              <input id="productInput" type="text" placeholder="nome do produto…">
-              <button id="addProductBtn">+</button>
+            <div id="productInputRow" style="display:none;">
+              <div class="orient-bar">
+                <span class="orient-label">Acesso pela:</span>
+                <button class="orient-btn" data-dir="N">&#8593; Norte</button>
+                <button class="orient-btn" data-dir="S">&#8595; Sul</button>
+                <button class="orient-btn" data-dir="W">&#8592; Oeste</button>
+                <button class="orient-btn active" data-dir="E">&#8594; Leste</button>
+                <span class="orient-active-info" id="orientInfo">Corredor à leste</span>
+              </div>
+              <div class="product-input-grid">
+                <input id="productInput" type="text" placeholder="nome do produto…">
+                <input id="priceInput" type="number" min="0" step="0.01" placeholder="R$ 0,00" class="price-input">
+                <button id="addProductBtn">+ Add</button>
+              </div>
             </div>
             <div class="tags" id="productTags"></div>
           </div>
@@ -485,6 +552,19 @@ datalist{display:none;}
         <div class="route-stats" id="routeStats"></div>
       </div>
 
+      <!-- Hardware / ESP8266 (manager only) -->
+      <div class="card" id="hwCard" style="display:none;">
+        <div class="panel-title">📡 Dispositivos físicos</div>
+        <div class="hw-card-inner">
+          <div class="gen-token-row">
+            <input type="text" id="hwLabelInput" placeholder="Nome do ESP8266 (ex: Prateleira A3)">
+            <button class="btn-sm" id="genTokenBtn">Gerar token</button>
+          </div>
+          <div class="token-result" id="tokenResult"></div>
+          <div id="hwTokenList"></div>
+        </div>
+      </div>
+
       <!-- Manager settings -->
       <div class="card" id="settingsCard" style="display:none;">
         <div class="panel-title">Configurações do gerente</div>
@@ -518,7 +598,7 @@ datalist{display:none;}
 // ─── State ────────────────────────────────────────────────────────────────────
 let authToken = null, userRole = null, username = null;
 let rows = 9, cols = 12;
-let grid = [], shelfProducts = {};
+let grid = [], shelfProducts = {}, shelfOrientations = {};
 let currentTool = 'select';
 let primarySel = null;       // "r,c" - single selected shelf
 let multiSel = new Set();    // Set of "r,c" - multi-select for merge
@@ -530,6 +610,17 @@ let isDirty = false;
 let activeListId = null; // lista de compras atualmente carregada
 const CELL = 44;
 const API = '';  // same origin
+
+
+// ── Helpers de produto com preço ──────────────────────────────────────────────
+// Produto pode ser string (legado) ou {name, price}
+function prodName(p){ return typeof p==='string' ? p : (p.name||''); }
+function prodPrice(p){ return typeof p==='string' ? null : (p.price||null); }
+function prodObj(name, price){ return price != null && price !== '' ? {name, price: parseFloat(price)||0} : name; }
+function fmtPrice(p){ return p!=null ? 'R$ '+p.toFixed(2).replace('.',',') : ''; }
+
+const ORIENT_ARROW = {N:'↑', S:'↓', W:'←', E:'→'};
+const ORIENT_LABEL = {N:'Norte (↑)', S:'Sul (↓)', W:'Oeste (←)', E:'Leste (→)'};
 
 // ─── Seções do mercado ────────────────────────────────────────────────────────
 const SECTION_TYPES = new Set([
@@ -557,6 +648,29 @@ async function api(method, path, body){
   const data = await r.json();
   if(!r.ok) throw new Error(data.error || 'Erro de servidor');
   return data;
+}
+
+
+// ─── Estado de estoque das prateleiras físicas ────────────────────────────────
+let shelfStockStatus = {}; // "shelf_id" -> { slot -> pct }
+let stockPollTimer = null;
+
+function startStockPolling(){
+  loadShelfStatus();
+  clearInterval(stockPollTimer);
+  stockPollTimer = setInterval(loadShelfStatus, 60000); // atualiza a cada 1min
+}
+
+async function loadShelfStatus(){
+  try{
+    const rows = await api('GET','/shelves/status');
+    shelfStockStatus = {};
+    rows.forEach(r=>{
+      if(!shelfStockStatus[r.shelf_id]) shelfStockStatus[r.shelf_id]={};
+      shelfStockStatus[r.shelf_id][r.slot] = r.pct;
+    });
+    renderGrid(); // redesenha células com overlays de estoque
+  }catch(e){ /* silencioso se não há dados */ }
 }
 
 // ─── Auth / gate ──────────────────────────────────────────────────────────────
@@ -682,10 +796,12 @@ async function enterApp(){
   applyRoleUI();
   if(userRole==='manager'){
     await loadLibrary();
+    await loadHwTokens();
     const lib = await api('GET','/layouts');
     const active = lib.find(l=>l.is_active) || lib[0];
     if(active) await loadLayout(active.id);
     else { defaultDemo(); renderAll(); }
+    startStockPolling();
   } else {
     try{
       const layout = await api('GET','/layouts/active');
@@ -703,6 +819,7 @@ async function enterApp(){
     }
     renderAll();
     if(userRole==='customer') await loadSavedLists();
+    startStockPolling();
   }
 }
 
@@ -721,6 +838,7 @@ function applyRoleUI(){
   // paineis
   document.getElementById('libraryPanel').style.display = isMgr ? 'block' : 'none';
   document.getElementById('settingsCard').style.display = isMgr ? 'block' : 'none';
+  document.getElementById('hwCard').style.display = isMgr ? 'block' : 'none';
   document.getElementById('productInputRow').style.display = isMgr ? 'flex' : 'none';
   // listas salvas
   document.getElementById('savedListsCard').style.display = (isCustomer||isGuest) ? 'block' : 'none';
@@ -738,7 +856,7 @@ function defaultDemo(){
   grid=emptyGrid(rows,cols); shelfProducts={};
   grid[0][0]='entrance'; grid[rows-1][cols-1]='checkout';
   const shelves=[
-    {r:1,c:2,type:'shelf',         items:['arroz','feijão','macarrão','farinha','açúcar','sal','óleo']},
+    {r:1,c:2,type:'shelf',         items:[{name:'arroz',price:6.99},{name:'feijão',price:8.49},{name:'macarrão',price:4.29},{name:'farinha',price:5.99},{name:'açúcar',price:4.49},{name:'sal',price:1.99},{name:'óleo',price:9.99}]},
     {r:1,c:5,type:'shelf',         items:['biscoito','salgadinho','granola','achocolatado']},
     {r:1,c:9,type:'secao-bebidas', items:['refrigerante','suco','água','cerveja','vinho']},
     {r:3,c:2,type:'secao-laticinios',items:['leite','iogurte','queijo','manteiga','creme de leite']},
@@ -762,13 +880,13 @@ function emptyGrid(r,c){return Array.from({length:r},()=>Array(c).fill('empty'))
 function cellKey(r,c){return r+','+c;}
 
 function applyLayoutData(data){
-  rows=data.rows; cols=data.cols; grid=data.grid; shelfProducts=data.shelfProducts||{};
+  rows=data.rows; cols=data.cols; grid=data.grid; shelfProducts=data.shelfProducts||{}; shelfOrientations=data.shelfOrientations||{};
   primarySel=null; multiSel=new Set(); isDirty=false;
   document.getElementById('rowsInput').value=rows;
   document.getElementById('colsInput').value=cols;
 }
 
-function currentData(){return{rows,cols,grid,shelfProducts};}
+function currentData(){return{rows,cols,grid,shelfProducts,shelfOrientations};}
 
 // ─── Dirty tracking ───────────────────────────────────────────────────────────
 function markDirty(){
@@ -902,6 +1020,22 @@ function renderGrid(){
           const b=document.createElement('span');
           b.className='badge-count';b.textContent=n;div.appendChild(b);
         }
+        const orient=shelfOrientations[key]||'E';
+        const oa=document.createElement('span');
+        oa.className='cell-orient';oa.textContent=ORIENT_ARROW[orient]||'→';div.appendChild(oa);
+        // overlay de estoque físico (se houver leitura do ESP8266)
+        const stockData = shelfStockStatus[key];
+        if(stockData){
+          const pcts = Object.values(stockData);
+          const minPct = Math.min(...pcts);
+          const bar = document.createElement('div');
+          bar.className = 'stock-bar ' + stockClass(minPct);
+          div.appendChild(bar);
+          const si = document.createElement('span');
+          si.className = 'stock-icon';
+          si.textContent = minPct > 60 ? '🟢' : minPct > 20 ? '🟡' : '🔴';
+          div.appendChild(si);
+        }
       }
       div.addEventListener('mousedown',e=>{isPainting=true;handleCell(r,c,e);});
       div.addEventListener('mouseenter',e=>{if(isPainting)handleCell(r,c,e);});
@@ -969,19 +1103,48 @@ function renderSingleShelf(){
   const sectionLabel = SECTION_NAMES[cellType] ? `${SECTION_ICONS[cellType]} ${SECTION_NAMES[cellType]}` : 'Prateleira';
   info.innerHTML=`${sectionLabel} <span class="mono">[${r}, ${c}]</span>`;
   inner.style.display='block';
+  // Atualiza botões de orientação para refletir a orientação atual
+  const curOrient = shelfOrientations[primarySel]||'E';
+  document.querySelectorAll('.orient-btn').forEach(b=>b.classList.toggle('active', b.dataset.dir===curOrient));
   document.getElementById('productInputRow').style.display = userRole==='manager' ? 'flex' : 'none';
   const tagsEl=document.getElementById('productTags');
   tagsEl.innerHTML='';
   const prods=shelfProducts[primarySel]||[];
   if(prods.length===0){tagsEl.innerHTML='<span class="empty-hint">Nenhum produto cadastrado.</span>';return;}
   prods.forEach((p,i)=>{
+    const name = prodName(p);
+    const price = prodPrice(p);
+    const isMgr = userRole==='manager';
     const t=document.createElement('span');
-    t.className='tag shelf-tag'+(userRole!=='manager'?' readonly':'');
-    t.innerHTML=`${esc(p)}${userRole==='manager'?` <button data-i="${i}">×</button>`:''}`;
-    if(userRole==='manager') t.querySelector('button').onclick=()=>{
-      shelfProducts[primarySel].splice(i,1);
-      renderShelfPanel(); renderGrid(); refreshKnownProducts(); markDirty();
-    };
+    t.className='tag shelf-tag'+(isMgr?'':' readonly');
+    // Preço: exibe badge se existir, botão de editar para gerentes
+    const priceHtml = price != null
+      ? `<span class="tag-price">R$ ${parseFloat(price).toFixed(2)}</span>`
+      : (isMgr ? `<span class="tag-price" style="opacity:.4">R$ —</span>` : '');
+    const editBtn = isMgr ? `<button class="tag-edit-price" title="Editar preço" data-i="${i}">✏</button>` : '';
+    const delBtn  = isMgr ? `<button data-i="${i}">×</button>` : '';
+    t.innerHTML=`${esc(name)}${priceHtml}${editBtn}${delBtn}`;
+    if(isMgr){
+      t.querySelector('button[data-i]:last-child').onclick=()=>{
+        shelfProducts[primarySel].splice(i,1);
+        renderShelfPanel(); renderGrid(); refreshKnownProducts(); markDirty();
+      };
+      t.querySelector('.tag-edit-price').onclick=()=>{
+        const cur = price!=null ? parseFloat(price).toFixed(2) : '';
+        const np = prompt(`Preço de "${name}" (deixe vazio para remover):`, cur);
+        if(np===null) return;
+        const entry = shelfProducts[primarySel][i];
+        const trimmed = np.trim().replace(',','.');
+        if(trimmed===''){
+          shelfProducts[primarySel][i] = name;
+        } else {
+          const parsed = parseFloat(trimmed);
+          if(isNaN(parsed)){ alert('Preço inválido.'); return; }
+          shelfProducts[primarySel][i] = {name, price: parsed};
+        }
+        renderShelfPanel(); markDirty();
+      };
+    }
     tagsEl.appendChild(t);
   });
 }
@@ -989,7 +1152,7 @@ function renderSingleShelf(){
 function renderMergePanel(){
   const keys=[...multiSel];
   document.getElementById('mergeInfo').textContent=keys.length+' prateleiras selecionadas';
-  const sets=keys.map(k=>new Set(shelfProducts[k]||[]));
+  const sets=keys.map(k=>new Set((shelfProducts[k]||[]).map(p=>prodName(p))));
   const union=new Set(sets.flatMap(s=>[...s]));
   const common=[...union].filter(p=>sets.every(s=>s.has(p)));
   const partial=[...union].filter(p=>!sets.every(s=>s.has(p)));
@@ -1000,10 +1163,12 @@ function renderMergePanel(){
   if(common.length===0) commonEl.innerHTML='<span class="empty-hint">Nenhum produto em comum.</span>';
   common.forEach(p=>{
     const t=document.createElement('span');t.className='tag merge-common';
-    t.innerHTML=`${esc(p)} <button>×</button>`;
+    const anyPrice=[...multiSel].map(k=>(shelfProducts[k]||[]).find(x=>prodName(x)===p)).map(x=>prodPrice(x)).find(v=>v!=null);
+    const priceTag=anyPrice!=null?`<span class="tag-price">R$ ${parseFloat(anyPrice).toFixed(2)}</span>`:'';
+    t.innerHTML=`${esc(p)}${priceTag} <button>×</button>`;
     t.querySelector('button').onclick=()=>{
       keys.forEach(k=>{
-        const idx=(shelfProducts[k]||[]).indexOf(p);
+        const idx=(shelfProducts[k]||[]).findIndex(x=>prodName(x)===p);
         if(idx>=0) shelfProducts[k].splice(idx,1);
       });
       renderMergePanel(); renderGrid(); refreshKnownProducts(); markDirty();
@@ -1022,7 +1187,11 @@ function renderMergePanel(){
     t.querySelector('button').onclick=()=>{
       keys.forEach(k=>{
         if(!shelfProducts[k]) shelfProducts[k]=[];
-        if(!shelfProducts[k].includes(p)) shelfProducts[k].push(p);
+        if(!(shelfProducts[k]||[]).some(x=>prodName(x)===p)){
+          // mantém preço se já existir em outra prateleira
+          const existing=[...multiSel].map(k2=>(shelfProducts[k2]||[]).find(x=>prodName(x)===p)).find(Boolean);
+          shelfProducts[k].push(existing ? {...existing} : p);
+        }
       });
       renderMergePanel(); renderGrid(); refreshKnownProducts(); markDirty();
     };
@@ -1045,9 +1214,13 @@ document.getElementById('mergeInput').onkeydown=e=>{if(e.key==='Enter')addMergeP
 
 document.getElementById('equalizeBtn').onclick=()=>{
   const keys=[...multiSel];
-  const union=new Set(keys.flatMap(k=>shelfProducts[k]||[]));
-  const arr=[...union];
-  keys.forEach(k=>shelfProducts[k]=arr.slice());
+  const union=new Set(keys.flatMap(k=>(shelfProducts[k]||[]).map(p=>prodName(p))));
+  // Para cada produto da união, usa o primeiro registro que tiver preço
+  const arr=[...union].map(name=>{
+    const withPrice=keys.map(k=>(shelfProducts[k]||[]).find(x=>prodName(x)===name)).find(x=>x&&prodPrice(x)!=null);
+    return withPrice || name;
+  });
+  keys.forEach(k=>shelfProducts[k]=arr.map(x=>typeof x==='string'?x:{...x}));
   renderMergePanel(); renderGrid(); refreshKnownProducts(); markDirty();
 };
 
@@ -1057,18 +1230,33 @@ document.getElementById('clearSelBtn2').onclick=clearSelection;
 
 function addProductToShelf(){
   const val=document.getElementById('productInput').value.trim();
+  const price=document.getElementById('priceInput').value.trim();
   if(!val||!primarySel) return;
   if(!shelfProducts[primarySel]) shelfProducts[primarySel]=[];
-  shelfProducts[primarySel].push(val);
+  shelfProducts[primarySel].push(prodObj(val, price===''?null:price));
   document.getElementById('productInput').value='';
+  document.getElementById('priceInput').value='';
   renderShelfPanel(); renderGrid(); refreshKnownProducts(); markDirty();
 }
 document.getElementById('addProductBtn').onclick=addProductToShelf;
 document.getElementById('productInput').onkeydown=e=>{if(e.key==='Enter')addProductToShelf();};
 
+// Orientação da prateleira
+const ORIENT_LABELS={N:'Corredor ao norte',S:'Corredor ao sul',W:'Corredor a oeste',E:'Corredor à leste'};
+document.querySelectorAll('.orient-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    if(!primarySel) return;
+    shelfOrientations[primarySel]=btn.dataset.dir;
+    document.querySelectorAll('.orient-btn').forEach(b=>b.classList.toggle('active', b.dataset.dir===btn.dataset.dir));
+    const infoEl=document.getElementById('orientInfo');
+    if(infoEl) infoEl.textContent=ORIENT_LABELS[btn.dataset.dir]||'';
+    renderGrid(); markDirty();
+  };
+});
+
 function refreshKnownProducts(){
   const list=document.getElementById('knownProducts');
-  const all=new Set(Object.values(shelfProducts).flat());
+  const all=new Set(Object.values(shelfProducts).flat().map(p=>prodName(p)));
   list.innerHTML=[...all].sort().map(p=>`<option value="${esc(p)}">`).join('');
 }
 
@@ -1175,7 +1363,7 @@ function computeRoute(){
   const shelfEntries=Object.entries(shelfProducts).filter(([k])=>{
     const[r,c]=k.split(',').map(Number);
     return isShelfLike(grid[r]?.[c]);
-  });
+  }).map(([k,ps])=>[k, ps.map(p=>prodName(p))]);
   const found=[],missing=[];
   const itemMatches={};
   shoppingList.forEach(item=>{
@@ -1249,13 +1437,23 @@ function renderRouteResult(result){
     clearRouteVisual();return;
   }
   result.warnings?.forEach(w=>{wEl.innerHTML+=`<div class="warn-box">${esc(w)}</div>`;});
+  let grandTotal = 0;
   result.stops.forEach(s=>{
     const li=document.createElement('li');
-    li.innerHTML=`<div><div>${s.items.map(esc).join(', ')}</div><div class="coord">${s.label||'Prateleira'} [${s.r}, ${s.c}]</div></div>`;
+    // busca preços dos produtos nessa prateleira
+    const shelfProds = shelfProducts[s.key]||[];
+    const itemsHtml = s.items.map(itemName=>{
+      const prodEntry = shelfProds.find(p=>prodName(p).toLowerCase()===itemName.toLowerCase());
+      const price = prodEntry ? prodPrice(prodEntry) : null;
+      if(price!=null) grandTotal+=price;
+      return `<span>${esc(itemName)}${price!=null?` <span class="route-item-price">${fmtPrice(price)}</span>`:''}</span>`;
+    }).join(', ');
+    const orientDir = shelfOrientations[s.key]||'E';
+    li.innerHTML=`<div><div>${itemsHtml}</div><div class="coord">${s.label||'Prateleira'} [${s.r}, ${s.c}] — acesso: ${ORIENT_LABEL[orientDir]}</div></div>`;
     lEl.appendChild(li);
   });
   if(result.missing?.length) mEl.innerHTML=`<div class="missing-box"><b>Não encontrados na planta</b><br>${result.missing.map(esc).join(', ')}</div>`;
-  sEl.textContent=`${result.stops.length} parada(s) · ${result.totalSteps} passos · ${result.hasCheckout?'termina no caixa':'termina na última prateleira'}`;
+  sEl.innerHTML=`${result.stops.length} parada(s) · ${result.totalSteps} passos · ${result.hasCheckout?'termina no caixa':'termina na última prateleira'}${grandTotal>0?`<div class="route-total">Total estimado: ${fmtPrice(grandTotal)}</div>`:''}`;
   drawRoute(result);
 }
 
@@ -1403,7 +1601,52 @@ document.getElementById('detachListBtn').onclick=()=>{
   loadSavedLists();
 };
 
+
+// ─── Hardware tokens ──────────────────────────────────────────────────────────
+async function loadHwTokens(){
+  if(userRole!=='manager') return;
+  try{
+    const rows = await api('GET','/hardware/tokens');
+    const el = document.getElementById('hwTokenList');
+    el.innerHTML = '';
+    if(!rows.length){ el.innerHTML='<span class="no-lists">Nenhum token gerado ainda.</span>'; return; }
+    rows.forEach(t=>{
+      const row = document.createElement('div');
+      row.className = 'hw-token-row';
+      row.innerHTML = `<span class="hw-label">${esc(t.label)}</span>
+        <span class="hw-token">${esc(t.token_preview)}</span>
+        <span style="font-size:11px;color:var(--ink-soft)">${(t.created_at||'').slice(0,10)}</span>
+        <button data-id="${t.id}">🗑</button>`;
+      row.querySelector('button').onclick = async()=>{
+        if(!confirm('Revogar este token?')) return;
+        try{ await api('DELETE','/hardware/tokens/'+t.id); await loadHwTokens(); }
+        catch(e){ alert(e.message); }
+      };
+      el.appendChild(row);
+    });
+  }catch(e){ console.warn('Erro tokens:', e.message); }
+}
+
+document.getElementById('genTokenBtn').onclick = async()=>{
+  const label = document.getElementById('hwLabelInput').value.trim() || 'ESP8266';
+  try{
+    const res = await api('POST','/hardware/token',{label});
+    const box = document.getElementById('tokenResult');
+    box.style.display = 'block';
+    box.innerHTML = `<b>Token gerado — copie agora, não será exibido novamente:</b><br>${esc(res.token)}`;
+    document.getElementById('hwLabelInput').value = '';
+    await loadHwTokens();
+  }catch(e){ alert(e.message); }
+};
+
 // ─── Utils ───────────────────────────────────────────────────────────────────
+function stockClass(pct){
+  if(pct > 60) return 'stock-ok';
+  if(pct > 20) return 'stock-mid';
+  if(pct > 0)  return 'stock-low';
+  return 'stock-empty';
+}
+
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
